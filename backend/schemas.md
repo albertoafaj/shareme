@@ -1,7 +1,7 @@
 users
 
 {
-  id: number,
+  email: string,
   userName: string,
   image: string
 }
