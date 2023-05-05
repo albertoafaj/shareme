@@ -10,9 +10,9 @@ module.exports = (app) => {
   router.post('/signin', async (req, res, next) => {
     try {
       if (!req.body.email) throw new ValidationsError('Usuário inválido');
-      const user = await app.services.user.findOne({ email: req.body.email });
+      let user = await app.services.user.findOne({ email: req.body.email });
       let payload;
-      if (!user) throw new ValidationsError('Usuário inválido');
+      if (!user) [user] = await app.services.user.save(req.body);
       if (bcrypt.compareSync(req.body.email, user.passwd)) {
         payload = {
           id: user.id,

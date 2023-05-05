@@ -17,17 +17,20 @@ beforeAll(async () => {
 });
 
 describe('when try loggin', () => {
-  const testTemplate = async (logginEmail) => {
+  const testTemplate = async (user) => {
     const result = await request(app)
       .post(`${MAIN_ROTE}${'/signin'}`)
-      .send({
-        email: logginEmail,
-      });
+      .send(user);
     return result;
   };
 
   test('should received token', async () => {
-    const result = await testTemplate('user_authenticated@google.com');
+    const result = await testTemplate({ email: 'user_authenticated@google.com' });
+    expect(result.status).toBe(200);
+    expect(result.body).toHaveProperty('token');
+  });
+  test('should create a user when he doesnt exist', async () => {
+    const result = await testTemplate({ email: 'user_non_exist@google.com', name: 'no-exist', image: 'no-exist' });
     expect(result.status).toBe(200);
     expect(result.body).toHaveProperty('token');
   });

@@ -15,7 +15,7 @@ module.exports = (app) => {
     { ...new FieldValidator('id', 0, 2147483647, 'number', true, true, true) },
     { ...new FieldValidator('nome', 0, 255, 'string', false, true, true) },
     { ...new FieldValidator('email', 0, 255, 'string', true, true, true) },
-    { ...new FieldValidator('senha', 0, 255, 'string', true, true, false) },
+    { ...new FieldValidator('senha', 0, 255, 'string', true, true, true) },
     { ...new FieldValidator('url da imagem', 0, 255, 'string', false, true, true) },
     { ...new FieldValidator('data de criação', 0, 255, 'string', false, true, true) },
   );
