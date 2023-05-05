@@ -1,29 +1,40 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import shareVideo from '../assets/video-ml.mp4';
 import logo from '../assets/logo-ml-w.svg';
 import jwt_decode from 'jwt-decode'
+import { useDispatch, useSelector } from 'react-redux';
+import { userLogin } from '../store/user';
+import Users from '../models/Users';
 
 const Login = () => {
 
+  const dispatch = useDispatch();
+
+  const { token } = useSelector((state) => state);
+
   const navigate = useNavigate();
 
-  const responseGoolge = (res) => {
-    const decoded = jwt_decode(res.credential);
-    localStorage.setItem('user', JSON.stringify(decoded));
-    const { name, email, picture } = decoded;
-    // TODO send doc to save user in backend;
-    const doc = {
-      email: email,
-      userName: name,
-      image: picture
-    };
-    console.log(doc);
+  useEffect(() => {
+    if (token?.data?.token) {
+      navigate('/');
+    }
+  }, [token, navigate])
 
+  const responseGoolge = async (res) => {
+
+    const decoded = jwt_decode(res.credential);
+    const { name, email, picture } = decoded;
+    const doc = new Users(name, email, picture);
     // TODO create a function that navigate to home when success login 
     // TODO ADD CORS rules in backend
+
+    dispatch(
+      userLogin(doc)
+    );
   };
+
   return (
     <div className='flex justify-start items-center flex-col h-screen'>
       <div className='relative w-full h-full'>
@@ -45,6 +56,7 @@ const Login = () => {
           <GoogleLogin
             onSuccess={credentialResponse => {
               responseGoolge(credentialResponse);
+
             }}
             onError={() => {
               console.log('Login Failed');
