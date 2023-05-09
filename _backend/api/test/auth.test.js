@@ -24,15 +24,17 @@ describe('when try loggin', () => {
     return result;
   };
 
-  test('should received token', async () => {
+  test('should set token in a cookie', async () => {
     const result = await testTemplate({ email: 'user_authenticated@google.com' });
     expect(result.status).toBe(200);
-    expect(result.body).toHaveProperty('token');
+    expect(result.header).toHaveProperty('set-cookie');
+    expect(result.header['set-cookie'][0].includes('token')).toBeTruthy();
   });
   test('should create a user when he doesnt exist', async () => {
     const result = await testTemplate({ email: 'user_non_exist@google.com', name: 'no-exist', image: 'no-exist' });
     expect(result.status).toBe(200);
-    expect(result.body).toHaveProperty('token');
+    expect(result.header).toHaveProperty('set-cookie');
+    expect(result.header['set-cookie'][0].includes('token')).toBeTruthy();
   });
 });
 
@@ -63,8 +65,16 @@ describe('when try validate a token', () => {
       .post(`${MAIN_ROTE}/signin`)
       .send({
         email: 'signup@user',
+        name: 'Signup User',
+        image: 'http://signup@user',
       });
-    return result.body.token;
+    const headerToken = {};
+    result.header['set-cookie'][0].split(';').forEach((item) => {
+      const [key, value] = item.trim().split('=');
+      headerToken[key] = value;
+    });
+    const { token } = headerToken;
+    return token;
   };
 
   const getUser = async (token) => {

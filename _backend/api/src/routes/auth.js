@@ -2,11 +2,13 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jwt-simple');
 const express = require('express');
 require('dotenv').config();
+const cookieParser = require('cookie-parser');
 
 const ValidationsError = require('../err/ValidationsError');
 
 module.exports = (app) => {
   const router = express.Router();
+  app.use(cookieParser());
   router.post('/signin', async (req, res, next) => {
     try {
       if (!req.body.email) throw new ValidationsError('Usuário inválido');
@@ -22,7 +24,8 @@ module.exports = (app) => {
         throw new ValidationsError('Usuário inválido');
       }
       const token = jwt.encode(payload, process.env.JWTSEC);
-      return res.status(200).json({ token });
+      res.cookie('token', token, { httpOnly: true });
+      return res.status(200).json({});
     } catch (error) {
       return next(error);
     }

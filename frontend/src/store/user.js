@@ -13,7 +13,6 @@ const { resetState: resetUserState, fetchError } = slice.actions;
 export const userLogin = (user) => async (dispatch) => {
   const { payload } = await dispatch(fetchToken(user));
   if (payload.token) {
-    window.localStorage.setItem('token', payload.token);
     await dispatch(fetchUser(payload.token));
   }
 };

@@ -5,6 +5,7 @@ export function TOKEN_POST(body) {
     url: API_URL + "/auth/signin",
     options: {
       method: "POST",
+      credentials: 'include',
       headers: {
         "Content-Type": "application/json",
       },
