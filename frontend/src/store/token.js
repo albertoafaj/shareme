@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import { TOKEN_POST } from '../api';
+import { TOKEN_GET } from '../api';
 import createAsyncSlice from './helper/createAsyncSlice';
 
 const slice = createAsyncSlice({
@@ -9,11 +9,11 @@ const slice = createAsyncSlice({
       token: Cookies.get('token') || null,
     },
   },
-  fetchConfig: (user) => TOKEN_POST(user),
+  fetchConfig: () => TOKEN_GET(),
 });
 
 export const fetchToken = slice.asyncAction;
-export const { resetState: resetTokenState } = slice.actions;
+export const { resetState: resetTokenState, fetchSuccess: fetchSuccessToken } = slice.actions;
 
 export default slice.reducer;
 

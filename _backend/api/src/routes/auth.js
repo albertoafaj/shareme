@@ -46,5 +46,16 @@ module.exports = (app) => {
       return next(error);
     }
   });
+  router.get('/token', async (req, res, next) => {
+    try {
+      const { token } = req.cookies;
+      let response;
+      if (token !== undefined) response = true;
+      else response = false;
+      return res.status(200).json(response);
+    } catch (error) {
+      return next(error);
+    }
+  });
   return router;
 };
