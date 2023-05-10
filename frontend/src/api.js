@@ -14,14 +14,12 @@ export function TOKEN_POST(body) {
   };
 }
 
-export function USER_GET(token) {
+export function USER_GET() {
   return {
     url: API_URL + "/v1/auth/validate",
     options: {
       method: "GET",
-      headers: {
-        Authorization: "Bearer " + token,
-      },
+      credentials: "include",
     },
   };
 }

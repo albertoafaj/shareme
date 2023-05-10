@@ -4,12 +4,20 @@ require('dotenv').config();
 
 const secret = process.env.JWTSEC;
 
-const { Strategy, ExtractJwt } = passportJwt;
+const { Strategy } = passportJwt;
 
 module.exports = (app) => {
+  const cookieExtractor = (req) => {
+    let token = null;
+    if (req && req.cookies) {
+      token = req.cookies.token;
+    }
+    return token;
+  };
+
   const params = {
     secretOrKey: secret,
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    jwtFromRequest: cookieExtractor,
   };
 
   const strategy = new Strategy(params, async (payload, done) => {
