@@ -4,7 +4,7 @@ import { fetchToken, resetTokenState } from './token';
 
 const slice = createAsyncSlice({
   name: 'user',
-  fetchConfig: (token) => USER_GET(token),
+  fetchConfig: () => USER_GET(),
 });
 
 export const fetchUser = slice.asyncAction;
@@ -24,11 +24,8 @@ export const userLogout = () => async (dispatch) => {
 };
 
 export const autoLogin = () => async (dispatch, getState) => {
-  const { token } = getState();
-  if (token?.data?.token) {
-    const { type } = await dispatch(fetchUser(token.data.token));
-    if (type === fetchError.type) dispatch(userLogout());
-  }
+  const { type } = await dispatch(fetchUser());
+  if (type === fetchError.type) dispatch(userLogout());
 };
 
 
