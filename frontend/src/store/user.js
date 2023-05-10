@@ -1,6 +1,7 @@
-import { USER_GET } from '../api';
+import Cookies from 'js-cookie';
+import { USER_GET, TOKEN_POST } from '../api';
 import createAsyncSlice from './helper/createAsyncSlice';
-import { fetchToken, resetTokenState } from './token';
+import { fetchSuccessToken, fetchToken, resetTokenState } from './token';
 
 const slice = createAsyncSlice({
   name: 'user',
@@ -8,24 +9,26 @@ const slice = createAsyncSlice({
 });
 
 export const fetchUser = slice.asyncAction;
-const { resetState: resetUserState, fetchError } = slice.actions;
+
+const { resetState: resetUserState } = slice.actions;
 
 export const userLogin = (user) => async (dispatch) => {
-  const { payload } = await dispatch(fetchToken(user));
-  if (payload.token) {
-    await dispatch(fetchUser(payload.token));
-  }
+  const { url, options } = TOKEN_POST(user);
+  const response = await fetch(url, options);
+  await dispatch(fetchSuccessToken(response.ok));
+  const { payload } = await dispatch(fetchUser());
+  if (!payload) await dispatch(resetTokenState());
 };
 
 export const userLogout = () => async (dispatch) => {
   dispatch(resetUserState());
   dispatch(resetTokenState());
-  window.localStorage.removeItem('token');
+  Cookies.remove('token');
 };
 
 export const autoLogin = () => async (dispatch, getState) => {
-  const { type } = await dispatch(fetchUser());
-  if (type === fetchError.type) dispatch(userLogout());
+  const { payload } = await dispatch(fetchToken());
+  if (payload) await dispatch(fetchUser());
 };
 
 

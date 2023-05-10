@@ -17,7 +17,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (token?.data?.token) {
+    if (token?.data === true) {
       navigate('/');
     }
   }, [token, navigate])
