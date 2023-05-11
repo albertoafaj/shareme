@@ -14,7 +14,7 @@ const Home = () => {
   const navigate = useNavigate();
   const scrollRef = useRef(null);
   React.useEffect(() => {
-    if (!token) {
+    if (!token.data) {
       navigate('/login');
     }
   }, [token]);
