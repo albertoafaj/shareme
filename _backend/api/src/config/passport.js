@@ -25,6 +25,7 @@ module.exports = (app) => {
       const users = await app.services.user.findOne(payload);
       if (users) {
         return done(null, {
+          id: users.id,
           name: users.name,
           email: users.email,
           image: users.image,
