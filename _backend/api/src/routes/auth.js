@@ -46,6 +46,15 @@ module.exports = (app) => {
       return next(error);
     }
   });
+  router.post('/signout', (req, res, next) => {
+    try {
+      const { token } = req.cookies;
+      res.clearCookie('token', token, { httpOnly: true });
+      return res.status(200).json({});
+    } catch (error) {
+      return next(error);
+    }
+  });
   router.get('/token', async (req, res, next) => {
     try {
       const { token } = req.cookies;

@@ -23,6 +23,15 @@ export function TOKEN_GET() {
     },
   };
 }
+export function TOKEN_REMOVE() {
+  return {
+    url: API_URL + "/auth/signout",
+    options: {
+      method: "POST",
+      credentials: "include",
+    },
+  };
+}
 export function USER_GET() {
   return {
     url: API_URL + "/v1/auth/validate",

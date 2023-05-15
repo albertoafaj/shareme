@@ -1,7 +1,6 @@
-import Cookies from 'js-cookie';
-import { USER_GET, TOKEN_POST } from '../api';
+import { USER_GET } from '../api';
 import createAsyncSlice from './helper/createAsyncSlice';
-import { fetchSuccessToken, fetchToken, resetTokenState } from './token';
+import { deleteToken, fetchToken, resetTokenState, saveToken } from './token';
 
 const slice = createAsyncSlice({
   name: 'user',
@@ -13,22 +12,21 @@ export const fetchUser = slice.asyncAction;
 const { resetState: resetUserState } = slice.actions;
 
 export const userLogin = (user) => async (dispatch) => {
-  const { url, options } = TOKEN_POST(user);
-  const response = await fetch(url, options);
-  await dispatch(fetchSuccessToken(response.ok));
+  await dispatch(saveToken(user));
   const { payload } = await dispatch(fetchUser());
   if (!payload) await dispatch(resetTokenState());
 };
 
 export const userLogout = () => async (dispatch) => {
+  dispatch(deleteToken());
   dispatch(resetUserState());
-  dispatch(resetTokenState());
-  Cookies.remove('token');
 };
 
 export const autoLogin = () => async (dispatch, getState) => {
   const { payload } = await dispatch(fetchToken());
   if (payload) await dispatch(fetchUser());
+  const state = getState();
+  if (state.user.data === null) dispatch(userLogout());
 };
 
 
