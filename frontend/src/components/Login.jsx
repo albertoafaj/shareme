@@ -26,7 +26,7 @@ const Login = () => {
 
     const decoded = jwt_decode(res.credential);
     const { name, email, picture } = decoded;
-    const doc = new Users(name, email, picture);
+    const doc = new Users(undefined, name, email, picture);
     // TODO create a function that navigate to home when success login 
     // TODO ADD CORS rules in backend
 
