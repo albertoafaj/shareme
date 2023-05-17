@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { IoMdAdd, IoMdSearch } from 'react-icons/io';
 const Navbar = ({ searchTerm, setSearchTerm }) => {
   const { user } = useSelector((state) => state);
+  const { data: userData } = user;
   const navigate = useNavigate();
   if (!user.data) return null;
   return (
@@ -18,6 +19,15 @@ const Navbar = ({ searchTerm, setSearchTerm }) => {
           onFocus={() => navigate('/search')}
           className='p-2 w-full bg-white outline-none'
         />
+      </div>
+      <div className='flex gap-3'>
+        <Link
+          to={`perfil-do-usuario/${userData.id}`}
+          className='hidden md:block'
+        >
+          <img src={userData.image} alt='imagem-do-usuario' className='w-14 h-12 rounded-lg' />
+        </Link>
+
       </div>
     </div>
   )
