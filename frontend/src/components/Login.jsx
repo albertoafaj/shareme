@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
-import shareVideo from '../assets/video-ml.mp4';
-import logo from '../assets/logo-ml-w.svg';
+import shareVideo from '../assets/share.mp4';
+import logo from '../assets/logowhite.png';
 import jwt_decode from 'jwt-decode'
 import { useDispatch, useSelector } from 'react-redux';
 import { userLogin } from '../store/user';
