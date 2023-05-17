@@ -28,7 +28,7 @@ const Home = () => {
     <>
       {userData?.id !== undefined &&
 
-        <div className="flex bg-gray-50 md:flex-fow flex-col h-screen transaction-height duration-75 ease-out">
+        <div className="flex bg-gray-50 md:flex-row flex-col h-screen transaction-height duration-75 ease-out">
           <div className="hidden md:flex h-screen flex-initial">
             <Sidebar closeToggle={setToggleSidebar} />
           </div>
