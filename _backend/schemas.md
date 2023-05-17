@@ -10,10 +10,10 @@ pin
 
 {
   id: number,
-  title: string,
+  title: string, match
   about: string,
   destination: string, <!-- url -->
-  category: string,
+  category: string, match
   image: string,
   userId: string,
   postedById: string,
