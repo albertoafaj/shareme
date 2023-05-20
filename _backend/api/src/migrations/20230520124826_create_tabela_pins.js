@@ -1,0 +1,24 @@
+exports.up = (knex) => knex.schema.createTable('pins', (t) => {
+  t.increments('id').primary();
+  t.string('title').notNull();
+  t.string('about');
+  t.string('destination');
+  t.integer('categoryId')
+    .references('id')
+    .inTable('categories')
+    .notNull();
+  t.integer('photoId')
+    .references('id')
+    .inTable('photos')
+    .notNull();
+  t.integer('userId')
+    .references('id')
+    .inTable('users')
+    .notNull();
+  t.string('postedBy').notNull();
+  t.json('saves').default(null);
+  t.json('comments').default(null);
+  t.timestamp('dateCreate', { useTz: true }).notNull().defaultTo(knex.fn.now());
+});
+
+exports.down = (knex) => knex.schema.dropTable('pins');
