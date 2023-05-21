@@ -4,7 +4,7 @@ exports.seed = async (knex) => {
     {
       id: 0,
       name: 'Main user',
-      email: process.env.EMAIL_USER,
+      email: process.env.ADMIN_USER,
       passwd: process.env.PSW_USER,
       image: 'http://main_user@photo',
       auth: true,

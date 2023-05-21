@@ -36,7 +36,7 @@ const testTemplateInsert = async (newData, errorMessage, status) => {
     .post(MAIN_ROTE)
     .set('Cookie', token)
     .send({
-      email: process.env.EMAIL_USER,
+      email: process.env.ADMIN_USER,
       name: user.name,
       image: user.image,
       ...newData,

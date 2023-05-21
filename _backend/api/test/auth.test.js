@@ -67,13 +67,6 @@ describe('auth route', () => {
       image: 'http://signup@user',
     };
 
-    const userAuth = {
-      email: 'signup@user',
-      name: 'Signup User',
-      image: 'http://signup@user',
-      auth: true,
-    };
-
     const getToken = async (userTest) => {
       const result = await request(app)
         .post(`${MAIN_ROTE}/signin`)
@@ -107,8 +100,8 @@ describe('auth route', () => {
       const userDB = await getUser('%invalidnjfdsanf');
       expect(userDB.status).toBe(401);
     });
-    test.only('should send the auth property if it is true', async () => {
-      const userDB = await getUser(await getToken(userAuth));
+    test('should send the auth property if it is a user admin', async () => {
+      const userDB = await getUser(await getToken({ email: process.env.ADMIN_USER }));
       expect(userDB.status).toBe(201);
       expect(userDB.body).toHaveProperty('auth');
     });
