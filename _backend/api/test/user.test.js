@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const MAIN_ROTE = '/v1/users';
 let user;
+let token;
 
 beforeAll(async () => {
   await app.db.migrate.rollback();
@@ -16,14 +17,14 @@ beforeAll(async () => {
     name: 'Main user',
     image: 'http://main_user@photo',
   };
-  user.token = jwt.encode({ id: user.id, email: user.email }, process.env.JWTSEC);
+  token = `token=${jwt.encode({ id: user.id, email: user.email }, process.env.JWTSEC)}`;
 });
 
 // ** GET USER **
 test('Should to list all users', async () => {
   const result = await request(app)
     .get(MAIN_ROTE)
-    .set('authorization', `bearer ${user.token}`);
+    .set('Cookie', token);
   expect(result.status).toBe(200);
   expect(result.body.length).toBeGreaterThan(0);
 });
@@ -33,9 +34,9 @@ test('Should to list all users', async () => {
 const testTemplateInsert = async (newData, errorMessage, status) => {
   const result = await request(app)
     .post(MAIN_ROTE)
-    .set('authorization', `bearer ${user.token}`)
+    .set('Cookie', token)
     .send({
-      email: `${Date.now()}@ranek.com`,
+      email: process.env.EMAIL_USER,
       name: user.name,
       image: user.image,
       ...newData,
@@ -72,7 +73,7 @@ describe('when try to insert a user', () => {
   test('should not insert user without email', async () => {
     const result = await request(app)
       .post(MAIN_ROTE)
-      .set('authorization', `bearer ${user.token}`)
+      .set('Cookie', token)
       .send({
         name: 'Not email user',
         image: 'http://main_user@photo',
@@ -92,7 +93,7 @@ describe('when try to insert a user', () => {
 const testTemplateUpdate = async (newData, errorMessage) => {
   const result = await request(app)
     .put(`${MAIN_ROTE}/${user.id}`)
-    .set('authorization', `bearer ${user.token}`)
+    .set('Cookie', token)
     .send({ ...newData });
   expect(result.status).toBe(400);
   expect(result.body.error).toBe(errorMessage);
@@ -100,7 +101,7 @@ const testTemplateUpdate = async (newData, errorMessage) => {
 test('Should update a users', async () => {
   const result = await request(app)
     .put(`${MAIN_ROTE}/${user.id}`)
-    .set('authorization', `bearer ${user.token}`)
+    .set('Cookie', token)
     .send({
       name: 'User#0',
       image: 'http://imageUpdated',
