@@ -13,8 +13,8 @@ describe('categories route', () => {
     const userAdm = user;
     userAdm.auth = true;
   });
-  // POST postedBy;
-  describe('when trying create a postedBy', () => {
+  // POST a savedPin;
+  describe('when trying create a savedPin', () => {
     test('should anthenticated the user (status 201)', () => { });
     test('should not allow unauthenticated user (status 401)', () => { });
     test('the userId should be a number', () => { });
@@ -38,5 +38,7 @@ describe('categories route', () => {
   describe('when trying remove a postedBy', () => {
     test('should anthenticated the user (status 201)', () => { });
     test('should not allow unauthenticated user (status 401)', () => { });
+    test('should not remove when it is related to a pin', () => { });
+    test('should not remove when it is related to a comment', () => { });
   });
 });
