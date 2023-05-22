@@ -21,20 +21,17 @@ describe('categories route', () => {
     test('the about field should be a string', () => { });
     test('the destination field should be a string', () => { });
     test('the categoryId field should be a number', () => { });
-    test('the userId field should be a number', () => { });
-    test('the postedBy field should be a string', () => { });
-    test('the name field should be a string', () => { });
+    test('the photoId field should be a number', () => { });
+    test('the postedById field should be a number', () => { });
     test('the saves field must be an object if it is not null', () => { });
     test('the comments field must be an object if it is not null', () => { });
     test('the title field should not be null', () => { });
     test('the categoryId field should not be null', () => { });
     test('the photoId field should not be null', () => { });
-    test('the photoId field should not be null', () => { });
-    test('the userId field should not be null', () => { });
-    test('the postedBy field should not be null', () => { });
+    test('the postedById field should not be null', () => { });
     test('the chosen categoryId should exist in DB', () => { });
-    test('the chosen userId should exist in DB', () => { });
     test('should save a photo in DB and return a photoId', () => { });
+    test('should save a postedBy in DB and return a postedById', () => { });
   });
   // GET all pins;
   describe('when trying read pins', () => {

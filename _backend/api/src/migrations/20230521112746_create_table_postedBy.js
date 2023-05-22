@@ -4,10 +4,6 @@ exports.up = (knex) => knex.schema.createTable('postedBy', (t) => {
     .references('id')
     .inTable('users')
     .notNull();
-  t.integer('pinId')
-    .references('id')
-    .inTable('pins')
-    .notNull();
   t.timestamp('dateCreate', { useTz: true }).notNull().defaultTo(knex.fn.now());
 });
 
