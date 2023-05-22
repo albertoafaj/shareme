@@ -38,7 +38,5 @@ describe('categories route', () => {
   describe('when trying remove a postedBy', () => {
     test('should anthenticated the user (status 201)', () => { });
     test('should not allow unauthenticated user (status 401)', () => { });
-    test('should not remove when it is related to a pin', () => { });
-    test('should not remove when it is related to a comment', () => { });
   });
 });
