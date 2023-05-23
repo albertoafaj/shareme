@@ -3,13 +3,13 @@ const multer = require('multer');
 // const fs = require('fs');
 const multerConfig = require('../config/multer');
 
-const updload = multer(multerConfig).array('files');
+const upload = multer(multerConfig).array('files');
 
 module.exports = (app) => {
   const router = Router();
 
-  // TODO Implement a maximum limit of 10 photos;
-  router.post('/', updload, async (req, res, next) => {
+  // TODO Implement a maximum limit of 1 photo;
+  router.post('/', upload, async (req, res, next) => {
     try {
       const result = await app.services.photo.save(req.files, req.body.photoTitles);
       return res.status(200).json(result);
