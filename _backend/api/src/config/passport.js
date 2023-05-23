@@ -23,13 +23,18 @@ module.exports = (app) => {
   const strategy = new Strategy(params, async (payload, done) => {
     try {
       const users = await app.services.user.findOne(payload);
-      if (users) {
-        return done(null, {
-          id: users.id,
-          name: users.name,
-          email: users.email,
-          image: users.image,
-        });
+      const response = {
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        image: users.image,
+      };
+      if (users && users.auth === true) {
+        response.auth = users.auth;
+        return done(null, response);
+      }
+      if (users && users.auth === false) {
+        return done(null, response);
       }
       return done(null, false);
     } catch (error) {
