@@ -20,74 +20,86 @@ module.exports = (app) => {
     { ...new FieldValidator('data de criação do produto', 0, 255, 'string', false, true, true) },
   );
 
-  const save = async (photos, titles) => {
-    try {
-      let titlesArr = [];
-      if (typeof titles === 'string') {
-        titlesArr.push(titles);
-      } else {
-        titlesArr = titles;
-      }
-      if (titlesArr === undefined) throw new ValidationsError('Nenhuma título de foto foi informado');
-      if (photos.length === 0) throw new ValidationsError('Nenhuma foto foi selecionada');
-      if (photos.length > titlesArr.length) throw new ValidationsError(`Foi(Foram) enviada(s) ${photos.length} foto(s) e informado apenas ${titlesArr.length} título(os)`);
-      const body = photos.map((photo, index) => {
-        const { path, ...newData } = photo;
-        const data = {
-          ...newData,
-          destination: photo.destination.replace('tmp\\', ''),
-          url: path.replace('tmp\\', ''),
-          title: titlesArr[index],
-        };
-        return data;
-      });
-      let response = [];
-      body.forEach((photo) => {
+  const validateFormData = (files, titles) => {
+    if (!titles.length) throw new ValidationsError('Nenhuma título de foto foi informado');
+    if (files.length === 0) throw new ValidationsError('Nenhuma foto foi selecionada');
+    if (files.length > titles.length) throw new ValidationsError(`Foi(Foram) enviada(s) ${files.length} foto(s) e informado apenas ${titles.length} título(os)`);
+  };
+
+  const preparePhotoData = (files, titles) => {
+    const photos = files.map((photo, index) => {
+      const { path, ...newData } = photo;
+      const data = {
+        ...newData,
+        destination: photo.destination.replace('tmp\\', ''),
+        url: path.replace('tmp\\', ''),
+        title: titles[index],
+      };
+      return data;
+    });
+    return photos;
+  };
+
+  const sendData = async (method, photos, id) => {
+    let results = [];
+    if (method === 'save') {
+      results = await Promise.all(photos.map(async (photo) => {
         dataValidator(photo, 'foto', photoValidator, false, true, false, true, true);
-        response.push(app.db('photos').insert(photo, '*'));
+        const result = await app.db('photos').insert(photo, '*');
+        return result[0];
+      }));
+    }
+    if (method === 'update') {
+      dataValidator(photos[0], 'foto', photoValidator, false, true, false, true, true);
+      const result = await app.db('photos').where({ id }).update(photos[0], '*');
+      results.push(result[0]);
+    }
+    return results;
+  };
+
+  const saveFilesInDiretory = (files) => {
+    files.forEach((file) => {
+      const tempPath = `${p.resolve(__dirname, '..', '..', 'tmp', 'uploads')}/${file.filename}`;
+      const finalPath = `${p.resolve(__dirname, '..', '..', 'uploads')}/${file.filename}`;
+      fs.rename(tempPath, finalPath, (err) => {
+        if (err) throw new ValidationsError(`Não foi possível salvar o arquivo ${file.originalname}`);
       });
-      response = await Promise.all(response).then((data) => data.map((el) => el[0]));
-      photos.forEach((file) => {
-        const tempPath = `${p.resolve(__dirname, '..', '..', 'tmp', 'uploads')}/${file.filename}`;
-        const finalPath = `${p.resolve(__dirname, '..', '..', 'uploads')}/${file.filename}`;
-        fs.rename(tempPath, finalPath, (err) => {
-          if (err) throw new ValidationsError(`Não foi possível salvar o arquivo ${file.originalname}`);
-        });
+    });
+  };
+
+  const removeFilesFromDiretory = (files) => {
+    files.forEach((file) => {
+      const tempPath = `${p.resolve(__dirname, '..', '..', 'tmp', 'uploads')}/${file.filename}`;
+      const finalPath = `${p.resolve(__dirname, '..', '..', 'uploads')}/${file.filename}`;
+      fs.rename(tempPath, finalPath, (err) => {
+        if (err) throw new ValidationsError(`Não foi possível salvar o arquivo ${file.originalname}`);
       });
+    });
+  };
+
+  const photoDataProcessing = async (body, method) => {
+    const { files, id, photoTitles } = body;
+    const titles = Array.isArray(photoTitles) ? photoTitles : [photoTitles];
+    try {
+      validateFormData(titles, files);
+      const photos = preparePhotoData(files, titles);
+      const response = sendData(method, photos, id);
+      saveFilesInDiretory(files);
       return response;
     } catch (error) {
-      const tmpUploads = p.resolve(__dirname, '..', '..', 'tmp', 'uploads');
-      await photos.forEach((file) => {
-        fs.unlink(`${tmpUploads}/${file.filename}`, (err) => {
-          if (err) throw new ValidationsError(`Não foi possível deletar o arquivo ${file.originalname}`);
-        });
-      });
+      removeFilesFromDiretory(files);
       throw error;
     }
   };
+
+  const save = (body) => photoDataProcessing(body, 'save');
+
+  const update = (body) => photoDataProcessing(body, 'update');
 
   const findOne = async (id) => {
     const photo = await app.db('photos').where(id).first();
     return photo;
   };
-
-  /*   const updateProductId = async (products) => {
-      let productsData = products[0];
-      let { photos } = productsData;
-      photos = await photos.map(async (photo) => {
-        const updated = {
-          ...photo,
-          productId: productsData.id,
-        };
-        return app.db('photos').where({ id: photo.id }).update(updated, '*');
-      });
-      photos = await Promise.all(photos).then((data) => data.map((el) => el[0]));
-      productsData.photos = photos;
-      delete productsData.dateCreate;
-      delete productsData.dateLastUpdate;
-      productsData = await app.services.product.update(productsData);
-      return productsData;
-    }; */
 
   const remove = async (id) => {
     const { url } = await app.services.photo
@@ -98,6 +110,6 @@ module.exports = (app) => {
   };
 
   return {
-    save, findOne, remove, photoValidator,
+    save, findOne, remove, update,
   };
 };
