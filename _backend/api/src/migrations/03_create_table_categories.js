@@ -1,7 +1,7 @@
 exports.up = (knex) => knex.schema.createTable('categories', (t) => {
   t.increments('id').primary();
-  t.string('name').notNull();
-  t.string('friendlyURL').notNull();
+  t.string('name').notNull().unique();
+  t.string('friendlyURL').notNull().unique();
   t.integer('photoId')
     .references('id')
     .inTable('photos')
