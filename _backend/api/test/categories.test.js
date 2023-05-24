@@ -1,7 +1,6 @@
 const request = require('supertest');
 const jwt = require('jwt-simple');
 const path = require('path');
-/* const { Readable } = require('stream'); */
 const app = require('../src/app');
 require('dotenv').config();
 
@@ -10,7 +9,7 @@ let token;
 let user;
 let userAdm;
 
-const testTemplate = async (userTest, body, status, errorMessage, operation) => {
+const testTemplate = async (userTest, body, status, errorMessage, operation, categoryId) => {
   token = `token=${jwt.encode({ id: userTest.id, email: userTest.email }, process.env.JWTSEC)}`;
   let result = {};
   switch (operation) {
@@ -25,6 +24,12 @@ const testTemplate = async (userTest, body, status, errorMessage, operation) => 
       break;
     case 'POST-JSON':
       result = await request(app).post(MAIN_ROTE).set('Cookie', token).send(body);
+      break;
+    case 'GET-ALL':
+      result = await request(app).get(MAIN_ROTE).set('Cookie', token);
+      break;
+    case 'GET-ONE':
+      result = await request(app).get(`${MAIN_ROTE}/${categoryId}`).set('Cookie', token);
       break;
     default:
       result = {};
@@ -60,19 +65,19 @@ describe('categories route', () => {
       expect(result.body).toHaveProperty('photoId');
     });
     test('should not allow it if the user is not admin (status 400)', async () => {
-      await testTemplate(user, newCategory, 400, 'Usuário não tem autorização para execultar a funcionalidade.', 'POST-JSON');
+      await testTemplate(user, newCategory, 400, 'Usuário não tem autorização para execultar a funcionalidade.', 'POST-JSON', '');
     });
     test('the name field should be a string', async () => {
-      await testTemplate(userAdm, { ...newCategory, name: 123 }, 400, 'O campo nome do(a) categoria deve ser um(a) string', 'POST-JSON');
+      await testTemplate(userAdm, { ...newCategory, name: 123 }, 400, 'O campo nome do(a) categoria deve ser um(a) string', 'POST-JSON', '');
     });
     test('the name field should be a string', async () => {
-      await testTemplate(userAdm, { ...newCategory, friendlyURL: 123 }, 400, 'O campo url amigavel do(a) categoria deve ser um(a) string', 'POST-JSON');
+      await testTemplate(userAdm, { ...newCategory, friendlyURL: 123 }, 400, 'O campo url amigavel do(a) categoria deve ser um(a) string', 'POST-JSON', '');
     });
     test('the name field should be unique', async () => {
-      await testTemplate(userAdm, { name: 'URL Amigavel', friendlyURL: 'test-url-amigavel' }, 400, 'A categoria URL Amigavel já existe.', 'POST-JSON');
+      await testTemplate(userAdm, { name: 'URL Amigavel', friendlyURL: 'test-url-amigavel' }, 400, 'A categoria URL Amigavel já existe.', 'POST-JSON', '');
     });
     test('the friendlyURL field should be unique', async () => {
-      await testTemplate(userAdm, { name: 'Teste URL Amigavel', friendlyURL: 'url-amigavel' }, 400, 'A URL amigavel url-amigavel já existe.', 'POST-JSON');
+      await testTemplate(userAdm, { name: 'Teste URL Amigavel', friendlyURL: 'url-amigavel' }, 400, 'A URL amigavel url-amigavel já existe.', 'POST-JSON', '');
     });
     describe('and save a photo', () => {
       const body = {
@@ -88,13 +93,27 @@ describe('categories route', () => {
   });
   // GET all categories;
   describe('when trying read categories', () => {
-    test('should anthenticated the user (status 201)', () => { });
-    test('should not allow unauthenticated user (status 401)', () => { });
+    test('should return all categories (status 200)', async () => {
+      const result = await testTemplate(userAdm, {}, 200, '', 'GET-ALL');
+      expect(result.body.length).toBeGreaterThan(1);
+      expect(result.body[0]).toHaveProperty('id');
+      expect(result.body[0]).toHaveProperty('name');
+      expect(result.body[0]).toHaveProperty('friendlyURL');
+      expect(result.body[0]).toHaveProperty('photoId');
+    });
   });
   // GET a category;
   describe('when trying read categories by id', () => {
-    test('should anthenticated the user (status 201)', () => { });
-    test('should not allow unauthenticated user (status 401)', () => { });
+    test('should return a categories', async () => {
+      const result = await testTemplate(user, {}, 200, '', 'GET-ONE', 10001);
+      expect(result.body.id).toBe(10001);
+      expect(result.body.name).toBe('Carros');
+      expect(result.body.friendlyURL).toBe('carros');
+      expect(result.body.photoId).toBe(null);
+    });
+    test('should not return if id is invalid', async () => {
+      await testTemplate(user, {}, 400, 'Categoria não encontrada.', 'GET-ONE', 10003);
+    });
   });
   // PUT categories;
   describe('when trying update a category', () => {

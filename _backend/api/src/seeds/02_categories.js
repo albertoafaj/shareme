@@ -7,5 +7,11 @@ exports.seed = async (knex) => {
       friendlyURL: 'url-amigavel',
       photoId: null,
     },
+    {
+      id: 10001,
+      name: 'Carros',
+      friendlyURL: 'carros',
+      photoId: null,
+    },
   ]);
 };

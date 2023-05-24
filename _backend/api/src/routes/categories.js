@@ -23,5 +23,22 @@ module.exports = (app) => {
       return next(error);
     }
   });
+  router.get('/', async (req, res, next) => {
+    try {
+      const response = await app.services.category.findAll();
+      return res.status(200).send(response);
+    } catch (error) {
+      return next(error);
+    }
+  });
+  router.get('/:id', async (req, res, next) => {
+    try {
+      const response = await app.services.category.findOne({ id: req.params.id }, true);
+      console.log(response);
+      return res.status(200).send(response);
+    } catch (error) {
+      return next(error);
+    }
+  });
   return router;
 };

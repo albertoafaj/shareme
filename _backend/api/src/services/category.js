@@ -10,13 +10,15 @@ module.exports = (app) => {
     { ...new FieldValidator('url amigavel', 0, 255, 'string', true, false, true) },
     { ...new FieldValidator('id da foto', 0, 2147483647, 'number', true, false, true) },
   );
-  const findOne = async (body) => {
-    const response = await app.db('categories').where(body).select().first();
-    return response;
+  const findOne = async (body, validation) => {
+    const category = await app.db('categories').where(body).select().first();
+    if (category === undefined && validation === true) throw new ValidationsError('Categoria não encontrada.');
+    return category;
   };
+  const findAll = async () => app.db('categories').select();
   const save = async (body) => {
     dataValidator(body, 'categoria', categoriesValidator, false, true, false, true, true);
-    const name = await findOne({ name: body.name });
+    const name = await findOne({ name: body.name }, false);
     const friendlyURL = await findOne({ friendlyURL: body.friendlyURL });
     if (name) throw new ValidationsError(`A categoria ${body.name} já existe.`);
     if (friendlyURL) throw new ValidationsError(`A URL amigavel ${body.friendlyURL} já existe.`);
@@ -26,5 +28,6 @@ module.exports = (app) => {
   return {
     save,
     findOne,
+    findAll,
   };
 };
