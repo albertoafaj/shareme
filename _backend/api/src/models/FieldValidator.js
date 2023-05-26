@@ -4,7 +4,7 @@ class FieldValidator {
     minFieldLength,
     maxFieldLength,
     fieldType,
-    isUnique,
+    isNotUpdatable,
     insertAtLogin,
     returnValue,
   ) {
@@ -12,7 +12,7 @@ class FieldValidator {
     this.minFieldLength = minFieldLength;
     this.maxFieldLength = maxFieldLength;
     this.fieldType = fieldType;
-    this.isUnique = isUnique;
+    this.isNotUpdatable = isNotUpdatable;
     this.insertAtLogin = insertAtLogin;
     this.returnValue = returnValue;
   }

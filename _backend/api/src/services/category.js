@@ -7,8 +7,8 @@ module.exports = (app) => {
   const categoriesValidator = new Categories(
     { ...new FieldValidator('id', 0, 2147483647, 'number', true, false, true) },
     { ...new FieldValidator('nome', 0, 255, 'string', false, false, true) },
-    { ...new FieldValidator('url amigavel', 0, 255, 'string', true, false, true) },
-    { ...new FieldValidator('id da foto', 0, 2147483647, 'number', true, false, true) },
+    { ...new FieldValidator('url amigavel', 0, 255, 'string', false, false, true) },
+    { ...new FieldValidator('id da foto', 0, 2147483647, 'number', false, false, true) },
   );
   const findOne = async (body, validation) => {
     const category = await app.db('categories').where(body).select().first();
@@ -16,7 +16,8 @@ module.exports = (app) => {
     return category;
   };
   const findAll = async () => app.db('categories').select();
-  const save = async (body) => {
+  const save = async (body, user) => {
+    if (!user.auth) throw new ValidationsError('Usuário não tem autorização para execultar a funcionalidade.');
     dataValidator(body, 'categoria', categoriesValidator, false, true, false, true, true);
     const name = await findOne({ name: body.name }, false);
     const friendlyURL = await findOne({ friendlyURL: body.friendlyURL });
@@ -25,9 +26,16 @@ module.exports = (app) => {
     const [response] = await app.db('categories').insert(body, '*');
     return response;
   };
+  const update = async (body, id, user) => {
+    if (!user.auth) throw new ValidationsError('Usuário não tem autorização para execultar a funcionalidade.');
+    dataValidator(body, 'categoria', categoriesValidator, false, true, true, true, true);
+    const result = await app.db('categories').where({ id }).update(body, '*');
+    return result;
+  };
   return {
     save,
     findOne,
     findAll,
+    update,
   };
 };

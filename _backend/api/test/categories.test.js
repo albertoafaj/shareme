@@ -31,6 +31,17 @@ const testTemplate = async (userTest, body, status, errorMessage, operation, cat
     case 'GET-ONE':
       result = await request(app).get(`${MAIN_ROTE}/${categoryId}`).set('Cookie', token);
       break;
+    case 'UPDATE':
+      result = (await request(app).put(`${MAIN_ROTE}/${categoryId}`).set('Cookie', token).send(body));
+      break;
+    case 'UPDATE-FORM':
+      result = await request(app)
+        .put(`${MAIN_ROTE}/${categoryId}`)
+        .set('Cookie', token)
+        .field('photoTitles', body.photoTitles)
+        .field('name', body.name)
+        .attach('files', `${path.resolve(__dirname, '..', 'tmp')}\\testFiles\\img-project-portfolio-360x280.jpg`);
+      break;
     default:
       result = {};
       break;
@@ -117,15 +128,43 @@ describe('categories route', () => {
   });
   // PUT categories;
   describe('when trying update a category', () => {
-    test('the user must be a admin user (status 201)', () => { });
-    test('should not allow it if the user is not admin (status 401)', () => { });
-    test('the name field should be a string', () => { });
-    test('the name field should be a string', () => { });
-    test('the friendlyURL field should not be null', () => { });
-    test('the friendlyURL field should not be null', () => { });
-    describe('and save a photo', () => {
-      test('the photoId field should be a number', () => { });
-      test('the photoId field should not be null', () => { });
+    test('the user must be a admin user (status 200)', async () => {
+      const result = await testTemplate(userAdm, { name: 'Pesca' }, 200, '', 'UPDATE', 10000);
+      expect(result.body.id).toBe(10000);
+      expect(result.body.name).toBe('Pesca');
+    });
+    test('should not allow it if the user is not admin (status 400)', async () => {
+      await testTemplate(user, { name: 'Pescafdf' }, 400, 'Usuário não tem autorização para execultar a funcionalidade.', 'UPDATE', 10000);
+    });
+    test('the name field should be a string', async () => {
+      await testTemplate(userAdm, { name: 123 }, 400, 'O campo nome do(a) categoria deve ser um(a) string', 'UPDATE', 10000);
+    });
+    test('the friendlyURL field should be a string', async () => {
+      await testTemplate(userAdm, { friendlyURL: 123 }, 400, 'O campo url amigavel do(a) categoria deve ser um(a) string', 'UPDATE', 10000);
+    });
+    test('the name field should not be null', async () => {
+      await testTemplate(userAdm, { name: null }, 400, 'O campo nome do(a) categoria é um atributo obrigatório', 'UPDATE', 10000);
+    });
+    test('the friendlyURL field should not be null', async () => {
+      await testTemplate(userAdm, { friendlyURL: null }, 400, 'O campo url amigavel do(a) categoria é um atributo obrigatório', 'UPDATE', 10000);
+    });
+    describe('and the photo', () => {
+      const body = {
+        photoTitles: 'Foto teste',
+        name: 'Pesca Amadora',
+      };
+      test('does not exist it should save a return of a photo ID', async () => {
+        const result = await testTemplate(userAdm, body, 200, '', 'UPDATE-FORM', 10000);
+        expect(result.body.photoId).not.toBeNull();
+        expect(result.body.name).toBe('Pesca Amadora');
+      });
+      test('exists it should update a return of a photo ID', async () => {
+        const result = await testTemplate(userAdm, { name: 'Pesca Esportiva', photoTitles: 'Foto da categoria pesca esportiva' }, 200, '', 'UPDATE-FORM', 10000);
+        const [photoDB] = await app.db('photos').where({ id: result.body.photoId });
+        expect(result.body.photoId).not.toBeNull();
+        expect(result.body.name).toBe('Pesca Esportiva');
+        expect(photoDB.title).toBe('Foto da categoria pesca esportiva');
+      });
     });
   });
   // DELETE categories;
