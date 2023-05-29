@@ -14,7 +14,7 @@ const testTemplate = async (userTest, body, status, errorMessage, operation, cat
   let result = {};
   switch (operation) {
     case 'POST-FORM':
-      // Perform a POST request with JSON data
+      // Perform a POST request with form data
       result = await request(app)
         .post(MAIN_ROTE)
         .set('Cookie', token)
