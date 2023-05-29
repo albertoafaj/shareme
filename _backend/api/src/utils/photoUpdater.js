@@ -8,7 +8,7 @@ module.exports = (app) => {
     };
     let result;
     if (method === 'save') [result] = await app.services.photo.save(photos);
-    if (method === 'update') [result] = await app.services.photo.save({ ...photos, id: photoId });
+    if (method === 'update') [result] = await app.services.photo.update({ ...photos, id: photoId });
     newBody.photoId = result.id;
     delete newBody.photoTitles;
     return newBody;
