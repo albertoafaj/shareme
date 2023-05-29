@@ -6,7 +6,7 @@ const MAIN_ROTE = '/v1/posted-by';
 let token;
 let user;
 
-const testTemplate = async (userTest, body, status, errorMessage, operation) => {
+const testTemplate = async (userTest, body, status, errorMessage, operation, id) => {
   token = `token=${jwt.encode({ id: userTest.id, email: userTest.email }, process.env.JWTSEC)}`;
   let result = {};
   switch (operation) {
@@ -17,6 +17,10 @@ const testTemplate = async (userTest, body, status, errorMessage, operation) => 
     case 'GET':
       // Perform a GET request to receive all postedBys
       result = await request(app).get(MAIN_ROTE).set('Cookie', token);
+      break;
+    case 'GET-ONE':
+      // Perform a GET request to receive a postedBy
+      result = await request(app).get(`${MAIN_ROTE}/${id}`).set('Cookie', token);
       break;
     default:
       result = {};
@@ -68,12 +72,17 @@ describe('postedBy route', () => {
       expect(result.body[0]).toHaveProperty('userId');
       expect(result.body[0]).toHaveProperty('dateCreate');
     });
-    test('should not allow unauthenticated user (status 401)', () => { });
   });
   // GET a postedBy;
   describe('when trying read postedBy by id', () => {
-    test('should anthenticated the user (status 201)', () => { });
-    test('should not allow unauthenticated user (status 401)', () => { });
+    test('should anthenticated the user (status 200)', async () => {
+      const result = await testTemplate(user, {}, 200, '', 'GET-ONE', 10000);
+      expect(result.body.id).toBe(10000);
+      expect(result.body.userId).toBe(10002);
+    });
+    test('should not return if id is invalid', async () => {
+      await testTemplate(user, {}, 400, 'ID do postado por não encontrado.', 'GET-ONE', 10003);
+    });
   });
   // DELETE a postedBy;
   describe('when trying remove a postedBy', () => {

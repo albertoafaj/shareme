@@ -1,6 +1,7 @@
 const FieldValidator = require('../models/FieldValidator');
 const PostedBy = require('../models/PostedBy');
 const dataValidator = require('../utils/dataValidator');
+const ValidationsError = require('../err/ValidationsError');
 
 module.exports = (app) => {
   // Field validators for postedBy
@@ -18,8 +19,16 @@ module.exports = (app) => {
   // Retrieve all postedBy
   const findAll = async () => app.db('postedBy').select();
 
+  // Retrieve a postedBy
+  const findOne = async (id) => {
+    const postedBy = await app.db('postedBy').where(id).select().first();
+    if (postedBy === undefined) throw new ValidationsError('ID do postado por não encontrado.');
+    return postedBy;
+  };
+
   return {
     save,
     findAll,
+    findOne,
   };
 };

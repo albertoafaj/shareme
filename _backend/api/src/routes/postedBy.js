@@ -24,5 +24,15 @@ module.exports = (app) => {
     }
   });
 
+  // Handle the HTTP GET request for retrieving a specific postedBy by ID
+  router.get('/:id', async (req, res, next) => {
+    try {
+      const response = await app.services.postedBy.findOne({ id: parseInt(req.params.id, 10) });
+      return res.status(200).json(response);
+    } catch (error) {
+      return next(error);
+    }
+  });
+
   return router;
 };
