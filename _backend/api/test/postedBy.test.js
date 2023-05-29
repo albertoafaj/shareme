@@ -63,6 +63,7 @@ describe('postedBy route', () => {
     test('should anthenticated the user (status 200)', async () => {
       const result = await testTemplate(user, {}, 200, '', 'GET');
       expect(result.status).toBe(200);
+      expect(result.body.length).toBe(2);
       expect(result.body[0]).toHaveProperty('id');
       expect(result.body[0]).toHaveProperty('userId');
       expect(result.body[0]).toHaveProperty('dateCreate');

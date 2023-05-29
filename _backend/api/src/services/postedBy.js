@@ -11,12 +11,15 @@ module.exports = (app) => {
   );
   // Create a new postedBy
   const save = async (body) => {
-    console.log(body);
     dataValidator(body, 'postado por', postedByValidator, false, true, false, true, true);
     const [response] = await app.db('postedBy').insert(body, '*');
     return response;
   };
+  // Retrieve all postedBy
+  const findAll = async () => app.db('postedBy').select();
+
   return {
     save,
+    findAll,
   };
 };
