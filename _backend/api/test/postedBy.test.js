@@ -14,6 +14,10 @@ const testTemplate = async (userTest, body, status, errorMessage, operation) => 
       // Perform a POST request and pass the userId in a cookie within the http request
       result = await request(app).post(MAIN_ROTE).set('Cookie', token);
       break;
+    case 'GET':
+      // Perform a GET request to receive all postedBys
+      result = await request(app).get(MAIN_ROTE).set('Cookie', token);
+      break;
     default:
       result = {};
       break;
@@ -42,21 +46,27 @@ describe('postedBy route', () => {
   });
   // POST postedBy;
   describe('when trying create a postedBy', () => {
-    test.only('should anthenticated the user (status 200)', async () => {
+    test('should anthenticated the user (status 200)', async () => {
       const result = await testTemplate(user, {}, 200, '', 'POST');
       expect(result.status).toBe(200);
       expect(result.body).toHaveProperty('id');
       expect(result.body).toHaveProperty('userId');
       expect(result.body).toHaveProperty('dateCreate');
     });
-    test.only('should not allow unauthenticated user (status 401)', async () => {
+    test('should not allow unauthenticated user (status 401)', async () => {
       const result = await request(app).post(MAIN_ROTE);
       expect(result.status).toBe(401);
     });
   });
   // GET all postedBy;
   describe('when trying read postedBy', () => {
-    test('should anthenticated the user (status 201)', () => { });
+    test('should anthenticated the user (status 200)', async () => {
+      const result = await testTemplate(user, {}, 200, '', 'GET');
+      expect(result.status).toBe(200);
+      expect(result.body[0]).toHaveProperty('id');
+      expect(result.body[0]).toHaveProperty('userId');
+      expect(result.body[0]).toHaveProperty('dateCreate');
+    });
     test('should not allow unauthenticated user (status 401)', () => { });
   });
   // GET a postedBy;
