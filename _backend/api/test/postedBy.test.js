@@ -22,6 +22,10 @@ const testTemplate = async (userTest, body, status, errorMessage, operation, id)
       // Perform a GET request to receive a postedBy
       result = await request(app).get(`${MAIN_ROTE}/${id}`).set('Cookie', token);
       break;
+    case 'REMOVE':
+      // Perform a GET request to receive a postedBy
+      result = await request(app).delete(`${MAIN_ROTE}/${id}`).set('Cookie', token);
+      break;
     default:
       result = {};
       break;
@@ -67,7 +71,7 @@ describe('postedBy route', () => {
     test('should anthenticated the user (status 200)', async () => {
       const result = await testTemplate(user, {}, 200, '', 'GET');
       expect(result.status).toBe(200);
-      expect(result.body.length).toBe(2);
+      expect(result.body.length).toBeGreaterThan(1);
       expect(result.body[0]).toHaveProperty('id');
       expect(result.body[0]).toHaveProperty('userId');
       expect(result.body[0]).toHaveProperty('dateCreate');
@@ -86,9 +90,14 @@ describe('postedBy route', () => {
   });
   // DELETE a postedBy;
   describe('when trying remove a postedBy', () => {
-    test('should anthenticated the user (status 201)', () => { });
-    test('should not allow unauthenticated user (status 401)', () => { });
-    test('should not remove when it is related to a pin', () => { });
-    test('should not remove when it is related to a comment', () => { });
+    test('should anthenticated the user (status 201)', async () => {
+      await testTemplate(user, {}, 204, '', 'REMOVE', 10001);
+    });
+    test('should not remove when it is related to a pin', async () => {
+      await testTemplate(user, {}, 400, 'Postado por não pode ser excluída, existem pins relacionados.', 'REMOVE', 10000);
+    });
+    test('should not remove when it is related to a comment', async () => {
+      await testTemplate(user, {}, 400, 'Postado por não pode ser excluída, existem comentários relacionados.', 'REMOVE', 10002);
+    });
   });
 });

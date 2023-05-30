@@ -26,9 +26,19 @@ module.exports = (app) => {
     return postedBy;
   };
 
+  // delete a postedBy
+  const remove = async (id) => {
+    const pins = await app.db('pins').where({ postedById: id.id }).select().first();
+    const comments = await app.db('comments').where({ postedById: id.id }).select().first();
+    if (pins) throw new ValidationsError('Postado por não pode ser excluída, existem pins relacionados.');
+    if (comments) throw new ValidationsError('Postado por não pode ser excluída, existem comentários relacionados.');
+    await app.db('postedBy').where(id).delete();
+  };
+
   return {
     save,
     findAll,
     findOne,
+    remove,
   };
 };

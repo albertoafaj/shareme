@@ -34,5 +34,15 @@ module.exports = (app) => {
     }
   });
 
+  // Handle the HTTP DELETE request for removing a specific category by ID
+  router.delete('/:id', async (req, res, next) => {
+    try {
+      await app.services.postedBy.remove({ id: parseInt(req.params.id, 10) });
+      return res.status(204).send();
+    } catch (error) {
+      return next(error);
+    }
+  });
+
   return router;
 };
