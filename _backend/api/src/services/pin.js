@@ -40,8 +40,16 @@ module.exports = (app) => {
   // Retrieve all pins
   const findAll = async () => app.db('pins').select('*');
 
+  // Retrieve a pin by id
+  const findOne = async (id, validation) => {
+    const pin = await app.db('pins').where(id).select().first();
+    if (pin === undefined && validation === true) throw new ValidationError('ID do pin não foi encontrado.');
+    return pin;
+  };
+
   return {
     save,
     findAll,
+    findOne,
   };
 };

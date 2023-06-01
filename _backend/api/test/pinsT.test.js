@@ -33,6 +33,12 @@ const testTemplate = async (userTest, body, status, errorMessage, operation, pin
         .get(MAIN_ROTE)
         .set('Cookie', token);
       break;
+    case 'GET-ONE':
+      // Perform a GET request to retrieve by id
+      result = await request(app)
+        .get(`${MAIN_ROTE}/${pinId}`)
+        .set('Cookie', token);
+      break;
     default:
       result = {};
       break;
@@ -106,7 +112,7 @@ describe('categories route', () => {
     });
   });
   // GET all pins;
-  describe.only('when trying read pins', () => {
+  describe('when trying read pins', () => {
     test('should anthenticated the user (status 201)', async () => {
       const result = await testTemplate(user, undefined, 200, undefined, 'GET-ALL', undefined);
       Object.entries(pinsAtributes).forEach(([key]) => {
@@ -116,9 +122,17 @@ describe('categories route', () => {
     });
   });
   // GET a pin;
-  describe('when trying read pins by id', () => {
-    test('should anthenticated the user (status 201)', () => { });
-    test('should not allow unauthenticated user (status 401)', () => { });
+  describe.only('when trying read pins by id', () => {
+    test('should anthenticated the user (status 201)', async () => {
+      const result = await testTemplate(user, undefined, 200, undefined, 'GET-ONE', 10000);
+      Object.entries(pinsAtributes).forEach(([key]) => {
+        expect(result.body).toHaveProperty(key);
+      });
+      expect(result.body.title).toBe('Animais selvagens');
+    });
+    test('should not return if id is invalid', async () => {
+      await testTemplate(user, {}, 400, 'ID do pin não foi encontrado.', 'GET-ONE', 999);
+    });
   });
   // GET pins by user;
   describe('when trying read pins by user', () => {
