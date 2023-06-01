@@ -22,5 +22,15 @@ module.exports = (app) => {
       return next(error);
     }
   });
+  // Handle the HTTP GET request for retrieve all pins
+  router.get('/', upload, async (req, res, next) => {
+    try {
+      // Save pins and return the response
+      const response = await app.services.pin.findAll();
+      return res.status(200).json(response);
+    } catch (error) {
+      return next(error);
+    }
+  });
   return router;
 };

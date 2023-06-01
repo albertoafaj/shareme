@@ -37,7 +37,11 @@ module.exports = (app) => {
     return response;
   };
 
+  // Retrieve all pins
+  const findAll = async () => app.db('pins').select('*');
+
   return {
     save,
+    findAll,
   };
 };

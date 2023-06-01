@@ -8,6 +8,7 @@ const MAIN_ROTE = '/v1/pins';
 let token;
 let user;
 let userAdm;
+const pinsAtributes = new Pins();
 
 const testTemplate = async (userTest, body, status, errorMessage, operation, pinId) => {
   token = `token=${jwt.encode({ id: userTest.id, email: userTest.email }, process.env.JWTSEC)}`;
@@ -17,7 +18,6 @@ const testTemplate = async (userTest, body, status, errorMessage, operation, pin
       // Perform a POST request with JSON data
       result = await request(app)
         .post(MAIN_ROTE)
-        /* .set('Content-Type', 'multipart/form-data') */
         .set('Cookie', token)
         .field('title', body.title)
         .field('about', body.about)
@@ -26,6 +26,12 @@ const testTemplate = async (userTest, body, status, errorMessage, operation, pin
         .field('photoTitles', body.photoTitles)
         .field('postedById', parseInt(body.postedById, 10))
         .attach('files', `${path.resolve(__dirname, '..', 'tmp')}\\testFiles\\img-project-portfolio-360x280.jpg`);
+      break;
+    case 'GET-ALL':
+      // Perform a GET request to retrieve all pins
+      result = await request(app)
+        .get(MAIN_ROTE)
+        .set('Cookie', token);
       break;
     default:
       result = {};
@@ -60,7 +66,6 @@ describe('categories route', () => {
     body.photoTitles = 'Test photo of the POST method pins';
     test('should anthenticated the user (status 200)', async () => {
       const result = await testTemplate(user, body, 200, null, 'POST', null);
-      const pinsAtributes = new Pins();
       Object.entries(pinsAtributes).forEach(([key]) => {
         expect(result.body).toHaveProperty(key);
       });
@@ -85,7 +90,6 @@ describe('categories route', () => {
       const newBody = body;
       newBody.title = 'Photo pin';
       const result = await testTemplate(user, newBody, 200, null, 'POST', null);
-      const pinsAtributes = new Pins();
       Object.entries(pinsAtributes).forEach(([key]) => {
         expect(result.body).toHaveProperty(key);
       });
@@ -95,7 +99,6 @@ describe('categories route', () => {
       const newBody = body;
       newBody.title = 'Posted pin';
       const result = await testTemplate(user, newBody, 200, null, 'POST', null);
-      const pinsAtributes = new Pins();
       Object.entries(pinsAtributes).forEach(([key]) => {
         expect(result.body).toHaveProperty(key);
       });
@@ -103,9 +106,14 @@ describe('categories route', () => {
     });
   });
   // GET all pins;
-  describe('when trying read pins', () => {
-    test('should anthenticated the user (status 201)', () => { });
-    test('should not allow unauthenticated user (status 401)', () => { });
+  describe.only('when trying read pins', () => {
+    test('should anthenticated the user (status 201)', async () => {
+      const result = await testTemplate(user, undefined, 200, undefined, 'GET-ALL', undefined);
+      Object.entries(pinsAtributes).forEach(([key]) => {
+        expect(result.body[0]).toHaveProperty(key);
+      });
+      expect(result.body.length).toBeGreaterThanOrEqual(1);
+    });
   });
   // GET a pin;
   describe('when trying read pins by id', () => {
