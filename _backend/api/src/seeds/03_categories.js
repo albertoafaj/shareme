@@ -13,5 +13,11 @@ exports.seed = async (knex) => {
       friendlyURL: 'carros',
       photoId: null,
     },
+    {
+      id: 10002,
+      name: 'Teste Pins',
+      friendlyURL: 'teste-pins',
+      photoId: null,
+    },
   ]);
 };

@@ -9,8 +9,6 @@ exports.seed = async (knex) => {
       categoryId: 10000,
       photoId: 10000,
       postedById: 10000,
-      saves: null,
-      comments: null,
       dateCreate: knex.fn.now(),
     },
   ]);

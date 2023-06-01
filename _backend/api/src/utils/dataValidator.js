@@ -23,11 +23,16 @@ const validation = (
   Object.entries(data).forEach(([key, value]) => {
     if (key) dataLength += 1;
     const dataFields = getDataFields(key, validator);
-    if (checkIsNull && (value === null || value === undefined)) throw new ValidationError(`O campo ${dataFields.translationToPt} do(a) ${name} é um atributo obrigatório`);
-    const fieldLength = value.toString().length;
+    if (checkIsNull && dataFields.canBeNull === false && (value === null || value === undefined)) throw new ValidationError(`O campo ${dataFields.translationToPt} do(a) ${name} é um atributo obrigatório`);
+    let fieldLength;
+    if (dataFields.canBeNull && value === null) {
+      fieldLength = 0;
+    } else {
+      fieldLength = value.toString().length;
+    }
     if (
       (value && checkCanBeUpdated)
-      && (dataFields.isUnique === true)
+      && (dataFields.isNotUpdatable === true)
     ) throw new ValidationError(`O campo ${dataFields.translationToPt} não pode ser alterado`);
     if (insertAtLogin && dataFields.insertAtLogin === false) throw new ValidationError(`O campo ${dataFields.translationToPt} do(a) ${name} não deve ser inserido nessa etapa`);
     if (

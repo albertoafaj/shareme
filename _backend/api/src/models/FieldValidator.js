@@ -7,6 +7,8 @@ class FieldValidator {
     isNotUpdatable,
     insertAtLogin,
     returnValue,
+    // TODO refactor all code related
+    canBeNull,
   ) {
     this.translationToPt = translationToPt;
     this.minFieldLength = minFieldLength;
@@ -15,6 +17,7 @@ class FieldValidator {
     this.isNotUpdatable = isNotUpdatable;
     this.insertAtLogin = insertAtLogin;
     this.returnValue = returnValue;
+    this.canBeNull = canBeNull;
   }
 }
 module.exports = FieldValidator;

@@ -15,8 +15,6 @@ exports.up = (knex) => knex.schema.createTable('pins', (t) => {
     .references('id')
     .inTable('postedBy')
     .notNull();
-  t.json('saves').default(null);
-  t.json('comments').default(null);
   t.timestamp('dateCreate', { useTz: true }).notNull().defaultTo(knex.fn.now());
 });
 

@@ -23,6 +23,7 @@ describe('categories route', () => {
     test('the pinId field should not be null', () => { });
     test('the chosen userId should exist in DB', () => { });
     test('the chosen pinId should exist in DB', () => { });
+    test('should insert the savedPinId in saves ', () => { });
   });
   // GET all postedBy;
   describe('when trying read postedBy', () => {
