@@ -46,10 +46,43 @@ module.exports = (app) => {
     if (pin === undefined && validation === true) throw new ValidationError('ID do pin não foi encontrado.');
     return pin;
   };
+  // Remove a pin by id
+  const remove = async (id, user) => {
+    // Find the pin by id and check if exist
+    const pin = await findOne(id, true);
+
+    // Remove all associated savedPins and comments
+    await Promise.all([
+      app.db('savedPins').where({ pinId: pin.id }).select('*'),
+      app.db('comments').where({ pinId: pin.id }).select('*'),
+    ]);
+
+    // Find the postedBy user
+    const postedBy = await app.services.postedBy.findOne({ id: pin.postedById }, false);
+
+    // Check if the user is authorized to execute the functionality
+    if (user.auth === undefined && postedBy.userId !== user.id) throw new ValidationError('Usuário não tem autorização para execultar a funcionalidade.');
+
+    // Delete savedPins and comments associated with the pin
+    await Promise.all([
+      app.db('savedPins').where({ pinId: pin.id }).delete(),
+      app.db('comments').where({ pinId: pin.id }).delete(),
+    ]);
+
+    // Delete the pin itself
+    await app.db('pins').where(id).delete();
+
+    // Remove the associated photo and postedBy user
+    await Promise.all([
+      app.services.photo.remove({ id: pin.photoId }),
+      app.services.postedBy.remove({ id: postedBy.id }),
+    ]);
+  };
 
   return {
     save,
     findAll,
     findOne,
+    remove,
   };
 };
