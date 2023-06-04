@@ -17,6 +17,14 @@ const testTemplate = async (userTest, body, status, errorMessage, operation, id)
       and send pinId in the body */
       result = await request(app).post(MAIN_ROTE).set('Cookie', token).send(body);
       break;
+    case 'GET':
+      // Perform a GET request to retrieve all saved pins by pinId
+      result = await request(app).get(`${MAIN_ROTE}/${id}`).set('Cookie', token);
+      break;
+    case 'REMOVE':
+      // Perform a DELETE request to remove a saved pins by id
+      result = await request(app).delete(`${MAIN_ROTE}/${id}`).set('Cookie', token);
+      break;
     default:
       result = {};
       break;
@@ -54,19 +62,23 @@ describe('saved pins route', () => {
       await testTemplate(user, { pinId: 999 }, 400, 'ID do pin não foi encontrado.', 'POST', undefined);
     });
   });
-  // GET all postedBy;
-  describe('when trying read postedBy', () => {
-    test('should anthenticated the user (status 201)', () => { });
-    test('should not allow unauthenticated user (status 401)', () => { });
+  // GET all saved pins by pinId;
+  describe('when trying read all savedPins by pinId', () => {
+    test('should anthenticated the user (status 200)', async () => {
+      const result = await testTemplate(user, undefined, 200, undefined, 'GET', 10004);
+      Object.entries(savedPinsAtributes).forEach(([key]) => {
+        expect(result.body[0]).toHaveProperty(key);
+      });
+      expect(result.body.length).toBe(2);
+    });
   });
-  // GET a postedBy;
-  describe('when trying read postedBy by id', () => {
-    test('should anthenticated the user (status 201)', () => { });
-    test('should not allow unauthenticated user (status 401)', () => { });
-  });
-  // DELETE a postedBy;
-  describe('when trying remove a postedBy', () => {
-    test('should anthenticated the user (status 201)', () => { });
-    test('should not allow unauthenticated user (status 401)', () => { });
+  // DELETE a saved pin;
+  describe('when trying remove a savedPin', () => {
+    test('should anthenticated the user (status 204)', async () => {
+      await testTemplate(user, undefined, 204, undefined, 'REMOVE', 10000);
+    });
+    test('should not allow remove if belong to another user', async () => {
+      await testTemplate(user, undefined, 400, 'Usuário não tem autorização para execultar a funcionalidade.', 'REMOVE', 10002);
+    });
   });
 });

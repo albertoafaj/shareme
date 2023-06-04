@@ -1,6 +1,8 @@
 const FieldValidator = require('../models/FieldValidator');
 const SavedPins = require('../models/SavedPins');
 const dataValidator = require('../utils/dataValidator');
+const ValidationError = require('../err/ValidationsError');
+const validation = require('../utils/dataValidator');
 
 module.exports = (app) => {
   // Field validators for postedBy
@@ -12,14 +14,36 @@ module.exports = (app) => {
   );
   // Create a new savedPin
   const save = async (body) => {
-    console.log(body);
     await app.services.pin.findOne({ id: body.pinId }, true);
     dataValidator(body, 'marcadores salvos', postedByValidator, false, true, false, true, true);
     const [response] = await app.db('savedPins').insert(body, '*');
     return response;
   };
 
+  // Retrieve a pin by id
+  const findOne = async (id, validation) => {
+    const savedPin = await app.db('savedPins').where(id).select().first();
+    if (savedPin === undefined && validation === true) throw new ValidationError('ID do marcador salvo não foi encontrado.');
+    return savedPin;
+  };
+
+  // Retrieve all saved pins by pinId
+  const findAllByPinId = async (pinId) => {
+    await app.services.pin.findOne({ id: pinId }, true);
+    const response = await app.db('savedPins').where({ pinId: parseInt(pinId, 10) }).select('*');
+    return response;
+  };
+
+  // Remove a savedId by id
+  const remove = async (id, userId) => {
+    const savedPin = await findOne({ id }, true);
+    if (userId !== savedPin.userId) throw new ValidationError('Usuário não tem autorização para execultar a funcionalidade.');
+    await app.db('savedPins').where({ id }).delete();
+  };
+
   return {
     save,
+    findAllByPinId,
+    remove,
   };
 };

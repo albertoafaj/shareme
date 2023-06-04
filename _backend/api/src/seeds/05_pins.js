@@ -41,5 +41,15 @@ exports.seed = async (knex) => {
       postedById: 10009,
       dateCreate: knex.fn.now(),
     },
+    {
+      id: 10004,
+      title: 'Aves',
+      about: 'Aves aquáticas',
+      destination: null,
+      categoryId: 10000,
+      photoId: 10006,
+      postedById: 10010,
+      dateCreate: knex.fn.now(),
+    },
   ]);
 };

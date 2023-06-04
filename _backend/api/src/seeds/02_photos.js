@@ -79,5 +79,18 @@ exports.seed = async (knex) => {
       title: 'Pin photo for savedPins test',
       dateCreate: '2023-03-30T11:16:17.307Z',
     },
+    {
+      id: 10006,
+      fieldname: 'files',
+      originalname: 'img-project-portfolio-360x280.jpg',
+      encoding: '7bit',
+      mimetype: 'image/jpeg',
+      destination: 'D:\\Projects\\Pratical-studies\\shareme-v2\\_backend\\api\\uploads',
+      filename: 'not-remove-img-project-portfolio-360x280.jpg',
+      url: 'D:\\Projects\\Pratical-studies\\shareme-v2\\_backend\\api\\uploads\\not-remove-img-project-portfolio-360x280.jpg',
+      size: 6731,
+      title: 'Pin photo for savedPins test',
+      dateCreate: '2023-03-30T11:16:17.307Z',
+    },
   ]);
 };
