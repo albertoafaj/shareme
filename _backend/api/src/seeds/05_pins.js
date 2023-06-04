@@ -31,5 +31,15 @@ exports.seed = async (knex) => {
       postedById: 10005,
       dateCreate: knex.fn.now(),
     },
+    {
+      id: 10003,
+      title: 'Animais fantasticos',
+      about: 'Animais com habilidades especiais',
+      destination: null,
+      categoryId: 10000,
+      photoId: 10005,
+      postedById: 10009,
+      dateCreate: knex.fn.now(),
+    },
   ]);
 };

@@ -28,6 +28,9 @@ module.exports = (app) => {
   // Routes for pins
   protectRouter.use('/pins', app.routes.pins);
 
+  // Routes for saved-pins
+  protectRouter.use('/saved-pins', app.routes.savedPins);
+
   // Mount the protected router under the '/v1' path and require authentication using passport
   app.use('/v1', app.config.passport.authenticate(), protectRouter);
 };
