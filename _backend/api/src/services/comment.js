@@ -20,7 +20,15 @@ module.exports = (app) => {
     const [response] = await app.db('comments').insert(newBody, '*');
     return response;
   };
+
+  // Retrieve all comments by pinId
+  const findAllByPinId = async (pinId) => {
+    await app.services.pin.findOne({ id: pinId }, true);
+    const response = await app.db('comments').where({ pinId: parseInt(pinId, 10) }).select('*');
+    return response;
+  };
   return {
     save,
+    findAllByPinId,
   };
 };

@@ -11,11 +11,16 @@ const commentsAtributes = new Comments();
 const testTemplate = async (userTest, body, status, errorMessage, operation, id) => {
   token = `token=${jwt.encode({ id: userTest.id, email: userTest.email }, process.env.JWTSEC)}`;
   let result = {};
+  const pinId = id;
   switch (operation) {
     case 'POST':
       /* Perform a POST request and pass the userId in a cookie inside the http request
       and send pinId in the body */
       result = await request(app).post(MAIN_ROTE).set('Cookie', token).send(body);
+      break;
+    case 'GET':
+      // Perform a GET request to retrieve all comments by pinId
+      result = await request(app).get(`${MAIN_ROTE}/${pinId}`).set('Cookie', token);
       break;
     default:
       result = {};
@@ -47,7 +52,7 @@ describe('comments route', () => {
         expect(result.body).toHaveProperty(key);
       });
     });
-    test.only('the pinId should be a number', async () => {
+    test('the pinId should be a number', async () => {
       await testTemplate(user, { pinId: '10003' }, 400, 'O campo id do marcador do(a) comentários deve ser um(a) number', 'POST', undefined);
     });
     test('the pinId should exist in DB', async () => {
@@ -55,21 +60,24 @@ describe('comments route', () => {
     });
   });
   // GET all comments;
-  describe('when trying read commnets', () => {
-    test('should anthenticated the user (status 201)', () => { });
-    test('should not allow unauthenticated user (status 401)', () => { });
-  });
-  // GET a comment;
-  describe('when trying read comment by id', () => {
-    test('should anthenticated the user (status 201)', () => { });
-    test('should not allow unauthenticated user (status 401)', () => { });
+  describe('when trying read commnets read all comments by pinId', () => {
+    test('should return a list of comments (status 200)', async () => {
+      const result = await testTemplate(user, undefined, 200, undefined, 'GET', 10001);
+      Object.entries(commentsAtributes).forEach(([key]) => {
+        expect(result.body[0]).toHaveProperty(key);
+      });
+      expect(result.body.length).toBe(1);
+    });
+    test.only('should send a valid pinId', async () => {
+      await testTemplate(user, undefined, 400, 'ID do pin não foi encontrado.', 'GET', 999);
+    });
   });
   // PUT a comment;
   describe('when trying update a comment', () => {
-    test('should anthenticated the user (status 201)', () => { });
-    test('should not allow unauthenticated user (status 401)', () => { });
-    test('should not allow postedById', () => { });
-    test('the comment should be a string', () => { });
+    test('should anthenticated the user (status 201)', async () => { });
+    test('should not allow unauthenticated user (status 401)', async () => { });
+    test('should not allow postedById', async () => { });
+    test('the comment should be a string', async () => { });
     /*     test('the comment field should not have values smaller or larger than the preset', async () => {
           await templateUpdate(
             400, { ...product, name: stringGenaretor(266) }, 'O campo nome do produto deve ter de 0 a 255 caracteres', 10009
@@ -78,8 +86,8 @@ describe('comments route', () => {
   });
   // DELETE a comment;
   describe('when trying remove a comment', () => {
-    test('should anthenticated the user (status 201)', () => { });
-    test('should not allow unauthenticated user (status 401)', () => { });
-    test('should remove the postedBy that belongs to it', () => { });
+    test('should anthenticated the user (status 201)', async () => { });
+    test('should not allow unauthenticated user (status 401)', async () => { });
+    test('should remove the postedBy that belongs to it', async () => { });
   });
 });
