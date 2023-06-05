@@ -38,5 +38,17 @@ module.exports = (app) => {
     }
   });
 
+  // Handle the HTTP DELETE request to remove a comment by id
+  router.delete('/:id', async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.id;
+      await app.services.comment.remove(id, userId);
+      return res.status(204).send();
+    } catch (error) {
+      return next(error);
+    }
+  });
+
   return router;
 };

@@ -35,6 +35,10 @@ const testTemplate = async (userTest, body, status, errorMessage, operation, id)
       // Perform a GET request to retrieve all comments by pinId
       result = await request(app).put(`${MAIN_ROTE}/${commentId}`).set('Cookie', token).send(body);
       break;
+    case 'REMOVE':
+      // Perform a DELETE request to remove a comment by id
+      result = await request(app).delete(`${MAIN_ROTE}/${commentId}`).set('Cookie', token);
+      break;
     default:
       result = {};
       break;
@@ -44,6 +48,7 @@ const testTemplate = async (userTest, body, status, errorMessage, operation, id)
 
   // Verify the error message, if any
   if (result.body.error) {
+    console.log(result.body.error);
     expect(result.body.error).toBe(errorMessage);
   }
   return result;
@@ -86,7 +91,7 @@ describe('comments route', () => {
     });
   });
   // PUT a comment;
-  describe.only('when trying update a comment', () => {
+  describe('when trying update a comment', () => {
     test('should update the comment (status 200)', async () => {
       const result = await testTemplate(user, { comment: 'comment successfully updated.' }, 200, undefined, 'UPDATE', 10005);
       checkIfHaveAttributes(result.body);
@@ -109,9 +114,12 @@ describe('comments route', () => {
     });
   });
   // DELETE a comment;
-  describe('when trying remove a comment', () => {
-    test('should anthenticated the user (status 201)', async () => { });
-    test('should not allow unauthenticated user (status 401)', async () => { });
-    test('should remove the postedBy that belongs to it', async () => { });
+  describe('when trying remove a savedPin', () => {
+    test('should anthenticated the user (status 204)', async () => {
+      await testTemplate(user, undefined, 204, undefined, 'REMOVE', 10005);
+    });
+    test('should not allow remove if belong to another user', async () => {
+      await testTemplate(user, undefined, 400, 'Usuário não tem autorização para execultar a funcionalidade.', 'REMOVE', 10006);
+    });
   });
 });

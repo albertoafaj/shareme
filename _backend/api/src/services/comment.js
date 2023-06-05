@@ -38,21 +38,25 @@ module.exports = (app) => {
 
   // Retrieve all comments by pinId
   const update = async (id, body, user) => {
-    console.log(id);
     const comment = await findOne({ id }, true);
-    console.log(comment);
     const postedBy = await app.services.postedBy.findOne({ id: comment.postedById });
     if (user.id !== postedBy.userId) throw new ValidationError('Usuário não tem autorização para execultar a funcionalidade.');
-    console.log(id);
-    console.log(body);
     await findOne({ id }, true);
     dataValidator(body, 'comentários', commentsValidator, false, true, true, true, true);
     const response = await app.db('comments').where({ id }).update(body, '*');
     return response;
   };
+  // Remove a savedId by id
+  const remove = async (id, userId) => {
+    const comment = await findOne({ id }, true);
+    const postedBy = await app.services.postedBy.findOne({ id: comment.postedById });
+    if (userId !== postedBy.userId) throw new ValidationError('Usuário não tem autorização para execultar a funcionalidade.');
+    await app.db('savedPins').where({ id }).delete();
+  };
   return {
     save,
     findAllByPinId,
     update,
+    remove,
   };
 };
