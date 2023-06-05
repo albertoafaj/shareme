@@ -2,16 +2,25 @@ const request = require('supertest');
 const jwt = require('jwt-simple');
 const app = require('../src/app');
 const Comments = require('../src/models/Comments');
+const stringGenaretor = require('../src/utils/stringGenerator');
 
 const MAIN_ROTE = '/v1/comments';
 let token;
 let user;
 const commentsAtributes = new Comments();
 
+// Method to check whether the responses are correct
+const checkIfHaveAttributes = (response) => {
+  Object.entries(commentsAtributes).forEach(([key]) => {
+    expect(response).toHaveProperty(key);
+  });
+};
+
 const testTemplate = async (userTest, body, status, errorMessage, operation, id) => {
   token = `token=${jwt.encode({ id: userTest.id, email: userTest.email }, process.env.JWTSEC)}`;
   let result = {};
   const pinId = id;
+  const commentId = id;
   switch (operation) {
     case 'POST':
       /* Perform a POST request and pass the userId in a cookie inside the http request
@@ -21,6 +30,10 @@ const testTemplate = async (userTest, body, status, errorMessage, operation, id)
     case 'GET':
       // Perform a GET request to retrieve all comments by pinId
       result = await request(app).get(`${MAIN_ROTE}/${pinId}`).set('Cookie', token);
+      break;
+    case 'UPDATE':
+      // Perform a GET request to retrieve all comments by pinId
+      result = await request(app).put(`${MAIN_ROTE}/${commentId}`).set('Cookie', token).send(body);
       break;
     default:
       result = {};
@@ -68,21 +81,32 @@ describe('comments route', () => {
       });
       expect(result.body.length).toBe(1);
     });
-    test.only('should send a valid pinId', async () => {
+    test('should send a valid pinId', async () => {
       await testTemplate(user, undefined, 400, 'ID do pin não foi encontrado.', 'GET', 999);
     });
   });
   // PUT a comment;
-  describe('when trying update a comment', () => {
-    test('should anthenticated the user (status 201)', async () => { });
-    test('should not allow unauthenticated user (status 401)', async () => { });
-    test('should not allow postedById', async () => { });
-    test('the comment should be a string', async () => { });
-    /*     test('the comment field should not have values smaller or larger than the preset', async () => {
-          await templateUpdate(
-            400, { ...product, name: stringGenaretor(266) }, 'O campo nome do produto deve ter de 0 a 255 caracteres', 10009
-            );
-        }); */
+  describe.only('when trying update a comment', () => {
+    test('should update the comment (status 200)', async () => {
+      const result = await testTemplate(user, { comment: 'comment successfully updated.' }, 200, undefined, 'UPDATE', 10005);
+      checkIfHaveAttributes(result.body);
+      expect(result.body.comment).toBe('comment successfully updated.');
+    });
+    test('the comment should be a string', async () => {
+      await testTemplate(user, { comment: 123 }, 400, 'O campo comentário do(a) comentários deve ser um(a) string', 'UPDATE', 10005);
+    });
+    test('should not allow update if belong to another user', async () => {
+      await testTemplate(user, { comment: 'Try updating another users comment' }, 400, 'Usuário não tem autorização para execultar a funcionalidade.', 'UPDATE', 10006);
+    });
+    test('should not allow updating postedById', async () => {
+      await testTemplate(user, { postedById: 10000 }, 400, 'O campo id do postado por não pode ser alterado', 'UPDATE', 10005);
+    });
+    test('should not allow updating postedById', async () => {
+      await testTemplate(user, { pinId: 10000 }, 400, 'O campo id do marcador não pode ser alterado', 'UPDATE', 10005);
+    });
+    test('the comment field should not have values smaller or larger than the preset', async () => {
+      await testTemplate(user, { comment: stringGenaretor(266) }, 400, 'O campo comentário do(a) comentários deve ter de 0 a 255 caracteres', 'UPDATE', 10005);
+    });
   });
   // DELETE a comment;
   describe('when trying remove a comment', () => {

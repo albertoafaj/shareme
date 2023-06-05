@@ -56,5 +56,15 @@ exports.seed = async (knex) => {
       userId: 10002,
       dateCreate: knex.fn.now(),
     },
+    {
+      id: 10011,
+      userId: 10002,
+      dateCreate: knex.fn.now(),
+    },
+    {
+      id: 10012,
+      userId: 0,
+      dateCreate: knex.fn.now(),
+    },
   ]);
 };

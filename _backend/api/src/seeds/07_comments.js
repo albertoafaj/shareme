@@ -36,5 +36,19 @@ exports.seed = async (knex) => {
       comment: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor ultrices eleifend. Curabitur commodo diam non lacus tristique, ac varius nulla finibus. Fusce eu rutrum lacus. Sed sagittis mi at metus pharetra, ut tristique velit fermentum. ',
       dateCreate: knex.fn.now(),
     },
+    {
+      id: 10005,
+      postedById: 10011,
+      pinId: 10002,
+      comment: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor ultrices eleifend. Curabitur commodo diam non lacus tristique, ac varius nulla finibus. Fusce eu rutrum lacus. Sed sagittis mi at metus pharetra, ut tristique velit fermentum. ',
+      dateCreate: knex.fn.now(),
+    },
+    {
+      id: 10006,
+      postedById: 10012,
+      pinId: 10002,
+      comment: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor ultrices eleifend. Curabitur commodo diam non lacus tristique, ac varius nulla finibus. Fusce eu rutrum lacus. Sed sagittis mi at metus pharetra, ut tristique velit fermentum. ',
+      dateCreate: knex.fn.now(),
+    },
   ]);
 };

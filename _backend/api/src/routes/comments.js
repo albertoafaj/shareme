@@ -25,5 +25,18 @@ module.exports = (app) => {
     }
   });
 
+  // Handle the HTTP PUT request to update a comment
+  router.put('/:id', async (req, res, next) => {
+    try {
+      console.log(req.body);
+      const { body, user } = req;
+      const { id } = req.params;
+      const [response] = await app.services.comment.update(id, body, user);
+      return res.status(200).json(response);
+    } catch (error) {
+      return next(error);
+    }
+  });
+
   return router;
 };
