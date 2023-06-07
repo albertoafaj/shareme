@@ -48,7 +48,6 @@ const testTemplate = async (userTest, body, status, errorMessage, operation, id)
 
   // Verify the error message, if any
   if (result.body.error) {
-    console.log(result.body.error);
     expect(result.body.error).toBe(errorMessage);
   }
   return result;

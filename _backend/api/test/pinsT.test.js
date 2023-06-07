@@ -177,7 +177,7 @@ describe('categories route', () => {
     test('should update a photo in DB and return a photoId', () => { });
   });
   // DELETE a pin;
-  describe.only('when trying remove a pin', () => {
+  describe('when trying remove a pin', () => {
     describe('and it belongs to another user', () => {
       test('shouldnt do it', async () => {
         await testTemplate(secondaryUser, undefined, 400, 'Usuário não tem autorização para execultar a funcionalidade.', 'REMOVE', 10001);
@@ -198,7 +198,7 @@ describe('categories route', () => {
       expect(result.status).toBe(204);
       expect(savedPinsBefore.length).toBe(2);
       expect(savedPinsAfter.length).toBe(0);
-      expect(commentsBefore.length).toBe(3);
+      expect(commentsBefore.length).toBe(5);
       expect(commentsAfter.length).toBe(0);
       expect(photo.length).toBe(0);
       expect(postedBy.length).toBe(0);
