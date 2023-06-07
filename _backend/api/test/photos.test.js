@@ -61,7 +61,7 @@ describe('categories route', () => {
   });
   test('should delete a photos by id', async () => {
     const result = await request(app)
-      .delete(`${MAIN_ROUTE}/10000`)
+      .delete(`${MAIN_ROUTE}/10007`)
       .set('Cookie', token);
     expect(result.status).toBe(204);
   });

@@ -102,6 +102,10 @@ module.exports = (app) => {
   };
 
   const remove = async (id) => {
+    const pin = await app.services.pin.findOne({ photoId: id.id });
+    if (pin) throw new ValidationsError('A foto é relacionada a um pis e por isso não pode ser removido ');
+    const category = await app.services.category.findOne({ photoId: id.id });
+    if (category) throw new ValidationsError('A foto é relacionada a uma categoria e por isso não pode ser removido ');
     const { url } = await app.services.photo
       .findOne(id);
     const photo = await app.db('photos').where(id).delete();
