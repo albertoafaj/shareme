@@ -6,10 +6,10 @@ const ValidationsError = require('../err/ValidationsError');
 module.exports = (app) => {
   // Field validators for categories
   const categoriesValidator = new Categories(
-    { ...new FieldValidator('id', 0, 2147483647, 'number', true, false, true) },
-    { ...new FieldValidator('nome', 0, 255, 'string', false, false, true) },
-    { ...new FieldValidator('url amigavel', 0, 255, 'string', false, false, true) },
-    { ...new FieldValidator('id da foto', 0, 2147483647, 'number', false, false, true) },
+    { ...new FieldValidator('id', 0, 2147483647, 'number', true, false, true, false) },
+    { ...new FieldValidator('nome', 0, 255, 'string', false, false, true, false) },
+    { ...new FieldValidator('url amigavel', 0, 255, 'string', false, false, true, false) },
+    { ...new FieldValidator('id da foto', 0, 2147483647, 'number', false, false, true, true) },
   );
 
   // Retrieve a category by ID
