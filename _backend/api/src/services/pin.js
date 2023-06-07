@@ -51,12 +51,6 @@ module.exports = (app) => {
     // Find the pin by id and check if exist
     const pin = await findOne(id, true);
 
-    // Remove all associated savedPins and comments
-    await Promise.all([
-      app.db('savedPins').where({ pinId: pin.id }).select('*'),
-      app.db('comments').where({ pinId: pin.id }).select('*'),
-    ]);
-
     // Find the postedBy user
     const postedBy = await app.services.postedBy.findOne({ id: pin.postedById }, false);
 
