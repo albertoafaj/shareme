@@ -22,6 +22,7 @@ module.exports = (app) => {
       return next(error);
     }
   });
+
   // Handle the HTTP GET request for retrieve all pins
   router.get('/', async (req, res, next) => {
     try {
@@ -32,6 +33,19 @@ module.exports = (app) => {
       return next(error);
     }
   });
+
+  // Handle the HTTP GET request for retrieve a pin by id
+  router.get('/:id', async (req, res, next) => {
+    try {
+      // Save pins and return the response
+      const response = await app.services.pin.findOne({ id: req.params.id }, true);
+      return res.status(200).json(response);
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  // Handle the HTTP GET request for remove a pin by id
   router.delete('/:id', async (req, res, next) => {
     try {
       // Save pins and return the response
