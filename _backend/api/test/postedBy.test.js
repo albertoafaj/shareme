@@ -85,7 +85,7 @@ describe('postedBy route', () => {
       expect(result.body.userId).toBe(10002);
     });
     test('should not return if id is invalid', async () => {
-      await testTemplate(user, {}, 400, 'ID do postado por não encontrado.', 'GET-ONE', 10003);
+      await testTemplate(user, {}, 400, 'ID do postado por não encontrado.', 'GET-ONE', 999);
     });
   });
   // DELETE a postedBy;
