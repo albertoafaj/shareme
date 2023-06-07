@@ -67,10 +67,10 @@ describe('auth route', () => {
       image: 'http://signup@user',
     };
 
-    const getToken = async () => {
+    const getToken = async (userTest) => {
       const result = await request(app)
         .post(`${MAIN_ROTE}/signin`)
-        .send(user);
+        .send(userTest);
 
       return result.headers['set-cookie'][0];
     };
@@ -89,15 +89,21 @@ describe('auth route', () => {
     };
 
     test('should return a user', async () => {
-      const userDB = await getUser(await getToken());
+      const userDB = await getUser(await getToken(user));
       expect(userDB.status).toBe(201);
       expect(userDB.body).toHaveProperty('name');
       expect(userDB.body).toHaveProperty('email');
       expect(userDB.body).toHaveProperty('image');
+      expect(userDB.body).not.toHaveProperty('auth');
     });
     test('should access protect route', async () => {
       const userDB = await getUser('%invalidnjfdsanf');
       expect(userDB.status).toBe(401);
+    });
+    test('should send the auth property if it is a user admin', async () => {
+      const userDB = await getUser(await getToken({ email: process.env.ADMIN_USER }));
+      expect(userDB.status).toBe(201);
+      expect(userDB.body).toHaveProperty('auth');
     });
   });
 });

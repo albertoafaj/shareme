@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const MAIN_ROTE = '/v1/users';
 let user;
+let token;
 
 beforeAll(async () => {
   await app.db.migrate.rollback();
@@ -16,14 +17,14 @@ beforeAll(async () => {
     name: 'Main user',
     image: 'http://main_user@photo',
   };
-  user.token = jwt.encode({ id: user.id, email: user.email }, process.env.JWTSEC);
+  token = `token=${jwt.encode({ id: user.id, email: user.email }, process.env.JWTSEC)}`;
 });
 
 // ** GET USER **
 test('Should to list all users', async () => {
   const result = await request(app)
     .get(MAIN_ROTE)
-    .set('authorization', `bearer ${user.token}`);
+    .set('Cookie', token);
   expect(result.status).toBe(200);
   expect(result.body.length).toBeGreaterThan(0);
 });
@@ -33,9 +34,9 @@ test('Should to list all users', async () => {
 const testTemplateInsert = async (newData, errorMessage, status) => {
   const result = await request(app)
     .post(MAIN_ROTE)
-    .set('authorization', `bearer ${user.token}`)
+    .set('Cookie', token)
     .send({
-      email: `${Date.now()}@ranek.com`,
+      email: process.env.ADMIN_USER,
       name: user.name,
       image: user.image,
       ...newData,
@@ -72,19 +73,19 @@ describe('when try to insert a user', () => {
   test('should not insert user without email', async () => {
     const result = await request(app)
       .post(MAIN_ROTE)
-      .set('authorization', `bearer ${user.token}`)
+      .set('Cookie', token)
       .send({
         name: 'Not email user',
         image: 'http://main_user@photo',
       });
     expect(result.status).toBe(400);
-    expect(result.body.error).toBe('O campo email é um atributo obrigatório');
+    expect(result.body.error).toBe('O campo email do(a) usuário é um atributo obrigatório');
   });
 
   test('should not insert user with registered email', () => testTemplateInsert({ email: user.email }, 'Já existe um usuário com este email', 400));
-  test('Should not insert email to incorrect type', () => testTemplateInsert({ email: 12314 }, 'O campo email deve ser um(a) string', 400));
-  test('Should not insert name to incorrect type', () => testTemplateInsert({ name: 12314 }, 'O campo nome deve ser um(a) string', 400));
-  test('Should not insert image to incorrect type', () => testTemplateInsert({ image: 12314 }, 'O campo url da imagem deve ser um(a) string', 400));
+  test('Should not insert email to incorrect type', () => testTemplateInsert({ email: 12314 }, 'O campo email do(a) usuário deve ser um(a) string', 400));
+  test('Should not insert name to incorrect type', () => testTemplateInsert({ name: 12314 }, 'O campo nome do(a) usuário deve ser um(a) string', 400));
+  test('Should not insert image to incorrect type', () => testTemplateInsert({ image: 12314 }, 'O campo url da imagem do(a) usuário deve ser um(a) string', 400));
 });
 
 // ** UPDATE USER **
@@ -92,7 +93,7 @@ describe('when try to insert a user', () => {
 const testTemplateUpdate = async (newData, errorMessage) => {
   const result = await request(app)
     .put(`${MAIN_ROTE}/${user.id}`)
-    .set('authorization', `bearer ${user.token}`)
+    .set('Cookie', token)
     .send({ ...newData });
   expect(result.status).toBe(400);
   expect(result.body.error).toBe(errorMessage);
@@ -100,7 +101,7 @@ const testTemplateUpdate = async (newData, errorMessage) => {
 test('Should update a users', async () => {
   const result = await request(app)
     .put(`${MAIN_ROTE}/${user.id}`)
-    .set('authorization', `bearer ${user.token}`)
+    .set('Cookie', token)
     .send({
       name: 'User#0',
       image: 'http://imageUpdated',
@@ -112,11 +113,11 @@ test('Should update a users', async () => {
 });
 
 describe('when try to update the fields to null', () => {
-  test('Should not update the id', () => testTemplateUpdate({ id: null }, 'O campo id é um atributo obrigatório'));
-  test('Should not update the name', () => testTemplateUpdate({ name: null }, 'O campo nome é um atributo obrigatório'));
-  test('Should not update the email', () => testTemplateUpdate({ email: null }, 'O campo email é um atributo obrigatório'));
-  test('Should not update the image', () => testTemplateUpdate({ image: null }, 'O campo url da imagem é um atributo obrigatório'));
-  test('Should not update the dateCreate', () => testTemplateUpdate({ dateCreate: null }, 'O campo data de criação é um atributo obrigatório'));
+  test('Should not update the id', () => testTemplateUpdate({ id: null }, 'O campo id do(a) usuário é um atributo obrigatório'));
+  test('Should not update the name', () => testTemplateUpdate({ name: null }, 'O campo nome do(a) usuário é um atributo obrigatório'));
+  test('Should not update the email', () => testTemplateUpdate({ email: null }, 'O campo email do(a) usuário é um atributo obrigatório'));
+  test('Should not update the image', () => testTemplateUpdate({ image: null }, 'O campo url da imagem do(a) usuário é um atributo obrigatório'));
+  test('Should not update the dateCreate', () => testTemplateUpdate({ dateCreate: null }, 'O campo data de criação do(a) usuário é um atributo obrigatório'));
 });
 describe('when trying to update unique fields', () => {
   test('Should not update the id', () => testTemplateUpdate({ id: `${user.id}updated` }, 'O campo id não pode ser alterado'));
@@ -124,8 +125,8 @@ describe('when trying to update unique fields', () => {
 });
 
 describe('when try to update the fields to incorrect type', () => {
-  test('Should not update the name', () => testTemplateUpdate({ name: 123 }, 'O campo nome deve ser um(a) string'));
-  test('Should not update the image', () => testTemplateUpdate({ image: 123 }, 'O campo url da imagem deve ser um(a) string'));
+  test('Should not update the name', () => testTemplateUpdate({ name: 123 }, 'O campo nome do(a) usuário deve ser um(a) string'));
+  test('Should not update the image', () => testTemplateUpdate({ image: 123 }, 'O campo url da imagem do(a) usuário deve ser um(a) string'));
 });
 
 describe('when trying to update fields to values less than or greater than the preset', () => {
@@ -136,6 +137,6 @@ describe('when trying to update fields to values less than or greater than the p
     }
     return arr.reduce((acc, cur) => acc + cur);
   };
-  test('Should not update the name', () => testTemplateUpdate({ name: stringGenaretor(256) }, 'O campo nome deve ter de 0 a 255 caracteres'));
-  test('Should not update the image', () => testTemplateUpdate({ image: stringGenaretor(256) }, 'O campo url da imagem deve ter de 0 a 255 caracteres'));
+  test('Should not update the name', () => testTemplateUpdate({ name: stringGenaretor(256) }, 'O campo nome do(a) usuário deve ter de 0 a 255 caracteres'));
+  test('Should not update the image', () => testTemplateUpdate({ image: stringGenaretor(256) }, 'O campo url da imagem do(a) usuário deve ter de 0 a 255 caracteres'));
 });

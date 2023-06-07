@@ -12,12 +12,12 @@ module.exports = (app) => {
   };
 
   const usersValidator = new Users(
-    { ...new FieldValidator('id', 0, 2147483647, 'number', true, true, true) },
-    { ...new FieldValidator('nome', 0, 255, 'string', false, true, true) },
-    { ...new FieldValidator('email', 0, 255, 'string', true, true, true) },
-    { ...new FieldValidator('senha', 0, 255, 'string', true, true, true) },
-    { ...new FieldValidator('url da imagem', 0, 255, 'string', false, true, true) },
-    { ...new FieldValidator('data de criação', 0, 255, 'string', false, true, true) },
+    { ...new FieldValidator('id', 0, 2147483647, 'number', true, true, true, false) },
+    { ...new FieldValidator('nome', 0, 255, 'string', false, true, true, false) },
+    { ...new FieldValidator('email', 0, 255, 'string', true, true, true, false) },
+    { ...new FieldValidator('senha', 0, 255, 'string', true, true, true, false) },
+    { ...new FieldValidator('url da imagem', 0, 255, 'string', false, true, true, false) },
+    { ...new FieldValidator('data de criação', 0, 255, 'string', false, true, true, false) },
   );
 
   const getUserProps = (propField, valueField) => {

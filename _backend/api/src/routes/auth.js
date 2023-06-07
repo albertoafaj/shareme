@@ -41,6 +41,8 @@ module.exports = (app) => {
   });
   router.get('/validate', async (req, res, next) => {
     try {
+      const user = await app.services.user.findOne(req.user);
+      if (user.auth) req.user.auth = true;
       return res.status(201).json(req.user);
     } catch (error) {
       return next(error);

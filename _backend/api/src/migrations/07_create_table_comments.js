@@ -4,6 +4,10 @@ exports.up = (knex) => knex.schema.createTable('comments', (t) => {
     .references('id')
     .inTable('postedBy')
     .notNull();
+  t.integer('pinId')
+    .references('id')
+    .inTable('pins')
+    .notNull();
   t.string('comment', 255).notNull();
   t.timestamp('dateCreate', { useTz: true }).notNull().defaultTo(knex.fn.now());
 });

@@ -27,6 +27,7 @@ consign({ cwd: 'src', verbose: false })
   .then('./services')
   .then('./routes')
   .then('./config/routes.js')
+  .then('./utils/photoUpdater.js')
   .into(app);
 
 app.get('/', (req, res) => {
