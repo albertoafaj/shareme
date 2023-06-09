@@ -9,6 +9,8 @@ const Feed = () => {
   React.useEffect(() => {
     setLoading(true);
     if (categoryId) {
+      // TODO Fetch pins filter by search query
+
       // TODO Fetch pins filter by category
       setLoading(false);
 
@@ -17,6 +19,7 @@ const Feed = () => {
       setLoading(false);
     };
   }, [categoryId]);
+
   if (loading) return <Spinner message='Nós estamos adicionando novas idéias para o seu feed' />;
   return (
     <div className='flex flex-col justify-center items-center w-full h-full'>
