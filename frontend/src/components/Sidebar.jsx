@@ -4,47 +4,22 @@ import { RiHomeFill } from 'react-icons/ri';
 import { IoIosArrowForward } from 'react-icons/io';
 import logo from '../assets/logo.png';
 import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { fetchCategories } from '../store/categories';
 
 const Sidebar = ({ closeToogle }) => {
-  const { user } = useSelector((state) => state);
+  const dispatch = useDispatch();
+  const { user, categories } = useSelector((state) => state);
+  const { data: categoriesData } = categories;
   const { image, id, name } = user.data;
   const isNotActiveStyle = 'flex items-center px-5 gap-3 text-gray-500 hover:text-black transition-all duration-200 ease-in-out capitalize';
   const isActiveStyle = 'flex items-center px-5 gap-3 font-extrabold border-r-2 border-black transition-all duration-200 ease-in-out capitalize';
   const handleCloseSidebar = () => {
     if (closeToogle) closeToogle(false);
   };
-  const categories = [
-    {
-      id: 1,
-      name: 'Animais',
-      friendlyURL: 'animais',
-    },
-    {
-      id: 2,
-      name: 'Papéis de Parede',
-      friendlyURL: 'papeis-de-parede',
-    },
-    {
-      id: 3,
-      name: 'Fotos',
-      friendlyURL: 'fotos',
-    },
-    {
-      id: 4,
-      name: 'Jogos',
-      friendlyURL: 'jogos',
-    },
-    {
-      id: 5,
-      name: 'Codificação',
-      friendlyURL: 'codificacao',
-    },
-    {
-      id: 6,
-      name: 'Outros',
-      friendlyURL: 'outros',
-    },
-  ];
+  React.useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
   return (
     <div className='flex flex-col justify-between bg-white overflow-y-scrikk min-w-2010 hide-scrollbar'>
       <div className="flex flex-col"></div>
@@ -64,7 +39,7 @@ const Sidebar = ({ closeToogle }) => {
           Home
         </NavLink>
         <h3 className='mt-2 px-5 text-base 2xl:text-xl'>Descubra categorias</h3>
-        {categories.map((category) => {
+        {categoriesData && categoriesData.map((category) => {
           const { id, name, friendlyURL } = category;
           return <NavLink
             to={`/categorias/${friendlyURL}`}
@@ -74,8 +49,8 @@ const Sidebar = ({ closeToogle }) => {
           >
             {name}
           </NavLink>
-
-        })}
+        })
+        }
       </div>
       {id && (
         <Link
