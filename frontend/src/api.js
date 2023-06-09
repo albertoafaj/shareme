@@ -54,3 +54,13 @@ export function USER_POST(body) {
     },
   };
 }
+
+export function CATEGORIES_GET() {
+  return {
+    url: API_URL + "/v1/categories",
+    options: {
+      method: "GET",
+      credentials: "include",
+    },
+  };
+}
